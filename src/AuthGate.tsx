@@ -13,7 +13,7 @@ const intentions: {value:Intention;label:string}[] = [
   {value:'see_where_it_goes',label:'Meet new people'}
 ];
 const splitList = (value:string, max:number) => [...new Set(value.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,max);
-const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return d.toISOString().slice(0,10); };
+const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
