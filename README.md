@@ -1,13 +1,13 @@
 # Bloom — Bells University-first dating app
 
-Bloom is a mobile-first, campus-focused dating app project for adults aged 18 and over. The current UI prototype contains fictional sample profiles; those samples are not real members. Real discovery and cross-device messaging are not enabled until the dedicated Bloom Supabase project is created and the data-backed screens are connected.
+Bloom is a mobile-first, campus-focused dating app project for adults aged 18 and over. The current UI prototype contains fictional sample profiles; those samples are not real members. The dedicated Bloom Supabase project has been created. The frontend must be redeployed after configuring its Vercel environment variables; full registration, profile upload, matching, and cross-device messaging still require end-to-end testing.
 
 ## Run locally
 
 1. Install Node.js LTS.
 2. Run `npm install`.
 3. Copy `.env.example` to `.env.local`.
-4. Add the dedicated Bloom Supabase project URL and publishable key after the project has been created.
+4. Add the dedicated Bloom Supabase project URL and publishable key to `.env.local` for local development. These variables are also configured in Vercel for production, preview, and development.
 5. Run `npm run dev` and open the local URL Vite prints.
 
 Never add a Supabase `service_role` key or any secret key to frontend environment variables or Git.
