@@ -7,10 +7,10 @@ import App from './App';
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
 type Intention = 'meaningful_relationship' | 'dating_with_intention' | 'open_to_relationship' | 'see_where_it_goes';
 const intentions: {value:Intention;label:string}[] = [
-  {value:'meaningful_relationship',label:'Campus community'},
-  {value:'dating_with_intention',label:'Campus friends'},
-  {value:'open_to_relationship',label:'Study / activity partners'},
-  {value:'see_where_it_goes',label:'Meet new people'}
+  {value:'meaningful_relationship',label:'Discover student businesses'},
+  {value:'dating_with_intention',label:'Shop from student sellers'},
+  {value:'open_to_relationship',label:'Explore campus services'},
+  {value:'see_where_it_goes',label:'Support student entrepreneurs'}
 ];
 const splitList = (value:string, max:number) => [...new Set(value.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,max);
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
@@ -154,20 +154,20 @@ export default function AuthGate() {
     </header>
     <main className="bloom-auth-main">
       {stage==='welcome' && <section className="bloom-welcome">
-        <div className="bloom-orbit-art" aria-hidden="true"><div className="bloom-orbit orbit-a"/><div className="bloom-orbit orbit-b"/><div className="bloom-heart"><Users strokeWidth={1.5}/></div><span className="bloom-spark spark-a">✦</span><span className="bloom-spark spark-b">✧</span><span className="bloom-spark spark-c">✦</span><span className="bloom-art-caption">REAL PEOPLE. REAL CONNECTIONS.</span></div>
-        <p className="bloom-eyebrow"><Sparkles size={14}/> YOUR CAMPUS, A LITTLE CLOSER</p>
-        <h1>Your campus,<br/>your <em>people.</em></h1>
-        <p className="bloom-welcome-copy">Meet real Bells students, find people who share your interests, plan a campus hangout, or find a study partner.</p>
+        <div className="bloom-orbit-art" aria-hidden="true"><div className="bloom-orbit orbit-a"/><div className="bloom-orbit orbit-b"/><div className="bloom-heart"><Users strokeWidth={1.5}/></div><span className="bloom-spark spark-a">✦</span><span className="bloom-spark spark-b">✧</span><span className="bloom-spark spark-c">✦</span><span className="bloom-art-caption">STUDENT-OWNED. CAMPUS-BASED.</span></div>
+        <p className="bloom-eyebrow"><Sparkles size={14}/> BELLS UNIVERSITY MARKETPLACE</p>
+        <h1>Find what you need.<br/><em>Support student businesses.</em></h1>
+        <p className="bloom-welcome-copy">Discover products and services offered by students in your university community.</p>
         <div className="bloom-trust-row"><span><ShieldCheck size={16}/> Students aged 16+</span><span><LockKeyhole size={15}/> Privacy-minded</span></div>
         <button className="bloom-cta" onClick={()=>{setAuthMode('signup');setStage('auth');setError('')}}>Join BellsConnect <ArrowRight size={18}/></button>
         <button className="bloom-text-btn" onClick={()=>{setAuthMode('login');setStage('auth');setError('')}}>Already have an account? <strong>Log in</strong></button>
-        <p className="bloom-fineprint">A campus community for real people and respectful connections.</p>
+        <p className="bloom-fineprint">A student marketplace built to help campus businesses grow.</p>
       </section>}
       {stage==='auth' && <section className="bloom-form-panel">
         <button className="bloom-back-link" onClick={()=>{setStage('welcome');setError('')}}><ArrowLeft size={16}/> Back</button>
-        <p className="bloom-eyebrow"><Sparkles size={14}/> {authMode==='signup'?'YOUR NEXT CHAPTER':'WELCOME BACK'}</p>
-        <h1>{authMode==='signup'?'Let’s get you connected.':'Good to see you again.'}</h1>
-        <p className="bloom-form-intro">{authMode==='signup'?'Create your account to start building a profile that feels like you.':'Log in to pick up where you left off.'}</p>
+        <p className="bloom-eyebrow"><Sparkles size={14}/> {authMode==='signup'?'YOUR MARKETPLACE ACCOUNT':'WELCOME BACK'}</p>
+        <h1>{authMode==='signup'?'Create your BellsConnect account.':'Good to see you again.'}</h1>
+        <p className="bloom-form-intro">{authMode==='signup'?'Create an account to discover products and shop from student businesses.':'Log in to pick up where you left off.'}</p>
         <div className="bloom-mode-switch"><button className={authMode==='signup'?'active':''} onClick={()=>{setAuthMode('signup');setError('')}}>Create account</button><button className={authMode==='login'?'active':''} onClick={()=>{setAuthMode('login');setError('')}}>Log in</button></div>
         <form onSubmit={submitAuth} className="bloom-form">
           {authMode==='signup'&&<><label>Your name<input required autoComplete="name" value={displayName} onChange={e=>setDisplayName(e.target.value)} placeholder="What should we call you?" maxLength={50}/></label><label>Date of birth <small>BellsConnect is for students aged 16+</small><input required type="date" max={age16Date()} value={dob} onChange={e=>setDob(e.target.value)}/></label></>}
@@ -190,10 +190,10 @@ export default function AuthGate() {
           <label>Sports you’re into <small>Optional · comma-separated</small><input value={sports} onChange={e=>setSports(e.target.value)} placeholder="Football, basketball, tennis"/></label>
           <label>Things you like <small>Optional · comma-separated</small><input value={likes} onChange={e=>setLikes(e.target.value)} placeholder="Honesty, outdoor dates, Afrobeats"/></label>
           <label>Things you don’t like <small>Optional · comma-separated</small><input value={dislikes} onChange={e=>setDislikes(e.target.value)} placeholder="Rudeness, ghosting, loud places"/></label>
-          <label>What would you like to do on campus?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
+          <label>How will you use BellsConnect?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
           {error&&<p className="bloom-error" role="alert">{error}</p>}
           <button className="bloom-cta" disabled={busy}>{busy?<><LoaderCircle className="bloom-spinner"/> Saving your profile…</>:<>Finish profile <Check size={17}/></>}</button>
-          <p className="bloom-legal">Your date of birth stays private. Your profile photo is stored in a private bucket. You can review and change profile details later.</p>
+          <p className="bloom-legal">Your date of birth stays private. Your profile details support your marketplace account.</p>
         </form>
       </section>}
     </main>
