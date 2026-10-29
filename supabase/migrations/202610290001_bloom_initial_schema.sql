@@ -196,16 +196,24 @@ create policy "match participants can view matches" on public.matches for select
 using(user_low=(select auth.uid()) or user_high=(select auth.uid()));
 -- Match creation is intentionally performed by a trusted database function, not arbitrary client inserts.
 
+create or replace function public.is_conversation_member(conversation_id_value uuid)
+returns boolean language sql stable security definer set search_path = '' as $
+  select exists(select 1 from public.conversation_members cm
+    where cm.conversation_id=conversation_id_value and cm.user_id=(select auth.uid()));
+$;
+revoke all on function public.is_conversation_member(uuid) from public;
+grant execute on function public.is_conversation_member(uuid) to authenticated;
+
 create policy "conversation members can view conversations" on public.conversations for select to authenticated
-using(exists(select 1 from public.conversation_members cm where cm.conversation_id=id and cm.user_id=(select auth.uid())));
+using(public.is_conversation_member(id));
 create policy "members see conversation membership" on public.conversation_members for select to authenticated
-using(exists(select 1 from public.conversation_members mine where mine.conversation_id=conversation_id and mine.user_id=(select auth.uid())));
+using(public.is_conversation_member(conversation_id));
 -- Membership creation is reserved for the trusted matching function.
 create policy "members read messages" on public.messages for select to authenticated
-using(exists(select 1 from public.conversation_members cm where cm.conversation_id=messages.conversation_id and cm.user_id=(select auth.uid())));
+using(public.is_conversation_member(conversation_id));
 create policy "members send messages to matched conversations" on public.messages for insert to authenticated
 with check(sender_id=(select auth.uid())
-  and exists(select 1 from public.conversation_members cm where cm.conversation_id=messages.conversation_id and cm.user_id=(select auth.uid()))
+  and public.is_conversation_member(conversation_id)
   and not exists(
     select 1 from public.conversation_members mine
     join public.conversation_members other on other.conversation_id=mine.conversation_id and other.user_id<>mine.user_id
@@ -243,6 +251,9 @@ declare
   result public.profiles;
 begin
   if actor is null then raise exception 'Authentication required'; end if;
+  if not exists(select 1 from auth.users u where u.id=actor and u.email_confirmed_at is not null) then
+    raise exception 'Verify your email before completing your Bloom profile';
+  end if;
   if char_length(trim(coalesce(display_name_value,''))) not between 2 and 50 then raise exception 'Name must be 2 to 50 characters'; end if;
   if char_length(coalesce(bio_value,'')) > 500 then raise exception 'Bio is too long'; end if;
   if coalesce(cardinality(interests_value),0)>20 or coalesce(cardinality(sports_value),0)>15
