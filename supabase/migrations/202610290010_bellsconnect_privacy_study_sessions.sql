@@ -1,20 +1,5 @@
 -- BellsConnect privacy controls and study-session capacity.
 begin;
-create table if not exists public.campus_user_blocks (
- id uuid primary key default gen_random_uuid(),
- blocker_id uuid not null references public.profiles(id) on delete cascade,
- blocked_id uuid not null references public.profiles(id) on delete cascade,
- created_at timestamptz not null default now(),
- constraint campus_user_blocks_not_self check(blocker_id<>blocked_id),
- constraint campus_user_blocks_unique unique(blocker_id,blocked_id)
-);
-create index if not exists campus_user_blocks_blocked_idx on public.campus_user_blocks(blocked_id,blocker_id);
-alter table public.campus_user_blocks enable row level security;
-create policy "members read own blocks" on public.campus_user_blocks for select to authenticated using(blocker_id=(select auth.uid()));
-create policy "members create own blocks" on public.campus_user_blocks for insert to authenticated with check(blocker_id=(select auth.uid()) and exists(select 1 from public.profiles p where p.id=blocked_id and p.university='Bells University of Technology'));
-create policy "members remove own blocks" on public.campus_user_blocks for delete to authenticated using(blocker_id=(select auth.uid()));
-grant select,insert,delete on public.campus_user_blocks to authenticated;
-
 create table if not exists public.campus_user_reports (
  id uuid primary key default gen_random_uuid(),
  reporter_id uuid not null references public.profiles(id) on delete cascade,
@@ -30,7 +15,10 @@ alter table public.campus_user_reports enable row level security;
 create policy "members submit reports" on public.campus_user_reports for insert to authenticated with check(reporter_id=(select auth.uid()) and exists(select 1 from public.profiles p where p.id=reported_id and p.university='Bells University of Technology'));
 create policy "members read own submitted reports" on public.campus_user_reports for select to authenticated using(reporter_id=(select auth.uid()));
 grant insert,select on public.campus_user_reports to authenticated;
-revoke update,delete on public.campus_user_reports from anon,authenticated;
+create policy "admins review user reports" on public.campus_user_reports for select to authenticated using (exists(select 1 from public.bellsconnect_admins a where a.user_id=(select auth.uid())));
+create policy "admins update report status" on public.campus_user_reports for update to authenticated using (exists(select 1 from public.bellsconnect_admins a where a.user_id=(select auth.uid()))) with check (exists(select 1 from public.bellsconnect_admins a where a.user_id=(select auth.uid())));
+grant update(status) on public.campus_user_reports to authenticated;
+revoke delete on public.campus_user_reports from anon,authenticated;
 
 drop policy if exists "connected participants read campus messages" on public.campus_messages;
 create policy "connected participants read campus messages" on public.campus_messages for select to authenticated using(
