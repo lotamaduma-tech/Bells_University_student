@@ -206,3 +206,65 @@
   .bc-message { max-width:88%; }
   .bc-chat-form { padding:10px; }
 }
+
+
+/* BellsConnect profile polish: personal, clear, and easy to edit */
+.bc-my-profile{max-width:760px;margin:0 auto 22px;background:var(--bc-card);border:1px solid var(--bc-border);border-radius:22px;overflow:hidden;box-shadow:var(--bc-shadow)}
+.bc-my-profile-cover{min-height:180px;padding:26px 28px;display:flex;align-items:flex-end;gap:16px;position:relative;background:radial-gradient(circle at 82% 15%,#ffffffb8 0 8%,transparent 9%),linear-gradient(125deg,#e8e5ff 0%,#f5e8f5 53%,#f9f0e7 100%);flex-wrap:wrap}
+.bc-my-profile-cover>.bc-avatar-xl{width:100px;height:100px;border:4px solid #ffffffd9;box-shadow:0 8px 24px #2423331a;flex:0 0 auto}
+.bc-my-profile-cover>span{display:inline-flex;align-items:center;gap:6px;margin-bottom:7px;background:#ffffffd9;color:#5b4dc1;border:1px solid #ffffffb5;border-radius:99px;padding:8px 11px;font-size:10px;font-weight:750}
+.bc-cover-photo-action{margin-left:auto;align-self:flex-end;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:37px;padding:9px 12px;border:1px solid #ffffffd9;border-radius:11px;background:#ffffffed;color:#5145b3;font-size:11px;font-weight:800;box-shadow:0 3px 12px #25205a0a}
+.bc-cover-photo-action:hover{background:#fff;transform:translateY(-1px)}
+.bc-my-profile-body{padding:25px 28px 28px}
+.bc-my-profile-body h2{font:800 clamp(23px,3vw,30px)/1.2 Manrope,sans-serif;letter-spacing:-.9px;margin:0 0 10px}
+.bc-my-profile-body>p{color:var(--bc-muted);font-size:13px;line-height:1.8;margin:0;max-width:590px;overflow-wrap:anywhere}
+.bc-my-profile-body .bc-tags{margin:17px 0 20px;gap:8px}
+.bc-my-profile-body .bc-tags span{font-size:10px;padding:7px 10px;background:#f3f0ff;border-color:#e8e2ff;color:#5e50b8}
+.bc-my-profile-body>.bc-btn{margin:0 8px 10px 0}
+.bc-my-profile-body .bc-theme-setting{margin-top:22px;padding-top:20px;border-top:1px solid var(--bc-border)}
+.bc-profile-form{padding:25px 28px 28px}
+.bc-profile-form>label{display:flex;flex-direction:column;gap:8px;margin:0 0 17px;color:var(--bc-ink);font-size:12px;font-weight:750}
+.bc-profile-form>label input,.bc-profile-form>label textarea{width:100%;min-width:0;border:1px solid var(--bc-border);border-radius:12px;background:var(--bc-bg);color:var(--bc-ink);padding:12px 13px;font-size:12px;line-height:1.6;outline:none}
+.bc-profile-form>label input:focus,.bc-profile-form>label textarea:focus{border-color:#9186f5;box-shadow:0 0 0 3px #9186f51b}
+.bc-profile-form>label input[readonly]{background:#f1f0f6;color:#858496;cursor:not-allowed}
+.bc-profile-form>label .bc-field-hint{color:var(--bc-muted);font-size:10px;font-weight:500}
+.bc-profile-form>div:last-child{display:flex;gap:9px;flex-wrap:wrap;margin-top:7px}
+.bc-photo-edit{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:15px;margin-bottom:22px;border:1px solid var(--bc-border);border-radius:15px;background:var(--bc-bg)}
+.bc-photo-edit .bc-avatar-xl{width:76px;height:76px;flex:0 0 auto}
+.bc-photo-edit>small{width:100%;margin-top:-5px;color:var(--bc-muted);font-size:10px}
+.bc-photo-pick{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:39px;padding:10px 13px;border:1px solid var(--bc-border);border-radius:11px;background:var(--bc-card);color:var(--bc-ink);font-size:11px;font-weight:750;cursor:pointer}
+.bc-photo-pick:hover{border-color:#c9c1ff;background:#f8f7ff}
+.bc-photo-pick input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)}
+/* Compact reaction chips with a small, fixed set of expressive options */
+.bc-message-wrap{align-self:flex-start;display:flex;flex-direction:column;align-items:flex-start;max-width:88%;min-width:0}
+.bc-message-wrap.mine{align-self:flex-end;align-items:flex-end}
+.bc-message-wrap .bc-message{max-width:100%;white-space:pre-wrap}
+.bc-reaction-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:4px 2px 0;opacity:.92}
+.bc-reaction{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:28px;height:25px;padding:3px 6px;border:1px solid transparent;border-radius:99px;background:transparent;color:var(--bc-muted);font-size:12px;line-height:1;transition:background .15s,border-color .15s,transform .15s}
+.bc-reaction:hover{background:var(--bc-purple-soft);transform:translateY(-1px)}
+.bc-reaction.has-reactions{background:var(--bc-bg);border-color:var(--bc-border)}
+.bc-reaction.selected{background:#eeebff;border-color:#cfc8ff;color:#5143bb}
+.bc-reaction span{font-size:10px;font-weight:750}
+.bc-message-wrap.mine .bc-reaction-row{justify-content:flex-end}
+.bc-theme-dark .bc-my-profile{background:var(--bc-card);border-color:var(--bc-border)}
+.bc-theme-dark .bc-my-profile-cover{background:radial-gradient(circle at 82% 15%,#ffffff18 0 8%,transparent 9%),linear-gradient(125deg,#2c2945,#332637 53%,#352d2a)}
+.bc-theme-dark .bc-my-profile-cover>.bc-avatar-xl{border-color:#3b374c}
+.bc-theme-dark .bc-my-profile-cover>span,.bc-theme-dark .bc-cover-photo-action{background:#242231e8;color:#d6d0ff;border-color:#4a455e}
+.bc-theme-dark .bc-my-profile-body .bc-tags span{background:#302b4b;border-color:#494168;color:#d5ceff}
+.bc-theme-dark .bc-profile-form>label input[readonly]{background:#242331;color:#a5a2b5}
+.bc-theme-dark .bc-photo-edit{background:#242331}
+.bc-theme-dark .bc-photo-pick{background:#242331;color:var(--bc-ink)}
+.bc-theme-dark .bc-reaction.has-reactions{background:#282638;border-color:#48445d}
+.bc-theme-dark .bc-reaction.selected{background:#39315e;border-color:#6c5cbe;color:#e2dcff}
+@media(max-width:640px){
+ .bc-my-profile-cover{padding:20px;min-height:155px;gap:10px}
+ .bc-my-profile-cover>.bc-avatar-xl{width:82px;height:82px}
+ .bc-my-profile-cover>span{font-size:9px;padding:7px 9px}
+ .bc-cover-photo-action{width:100%;margin:2px 0 0;align-self:auto}
+ .bc-my-profile-body,.bc-profile-form{padding:21px 19px}
+ .bc-photo-edit{gap:10px;padding:12px}
+ .bc-message-wrap{max-width:94%}
+ .bc-reaction-row{gap:2px}
+ .bc-reaction{min-width:27px;height:26px}
+}
+@media(prefers-reduced-motion:reduce){.bc-cover-photo-action,.bc-reaction{transition:none}}
