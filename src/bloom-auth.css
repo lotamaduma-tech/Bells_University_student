@@ -52,3 +52,9 @@
 .bloom-loading{background:#f7f7fb;color:#242333}
 .bloom-loading strong span{color:#6554d9}
 @media(prefers-reduced-motion:reduce){.bloom-heart{animation:none}}
+
+/* Keep password text readable on the light password field */
+.bloom-input-wrap:has(input[type="password"]){background:#fff;border-color:#d9d5df;color:#6f6878}
+.bloom-input-wrap:has(input[type="password"]):focus-within{border-color:#d84f78;box-shadow:0 0 0 3px #d84f781c}
+.bloom-input-wrap input[type="password"]{color:#211d29!important;background:#fff!important;-webkit-text-fill-color:#211d29!important;caret-color:#211d29}
+.bloom-input-wrap input[type="password"]::placeholder{color:#8b8593!important;-webkit-text-fill-color:#8b8593!important;opacity:1}
