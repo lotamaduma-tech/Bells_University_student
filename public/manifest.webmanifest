@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "BellsConnect — Your campus, your people",
+  "short_name": "BellsConnect",
+  "description": "Meet students and make plans at Bells University of Technology.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f7fb",
+  "theme_color": "#f7f7fb",
+  "categories": ["social", "education"],
+  "icons": [
+    {
+      "src": "/bellsconnect-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

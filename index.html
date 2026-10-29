@@ -5,10 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f7f7fb" />
     <meta name="description" content="BellsConnect — meet students and make plans at Bells University." />
+    <meta name="application-name" content="BellsConnect" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BellsConnect" />
+    <link rel="icon" type="image/svg+xml" href="/bellsconnect-icon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/bellsconnect-icon.svg" />
     <title>BellsConnect — Your campus, your people.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      #bc-install-nudge{position:fixed;z-index:99999;right:18px;bottom:18px;width:min(360px,calc(100vw - 28px));padding:14px;display:none;align-items:center;gap:12px;background:#fff;color:#202033;border:1px solid #e8e8f1;border-radius:18px;box-shadow:0 18px 55px #25234b24;font:14px/1.4 'DM Sans',system-ui,sans-serif}
+      #bc-install-nudge.visible{display:flex;animation:bc-install-in .24s ease-out}
+      #bc-install-nudge .bc-install-icon{width:44px;height:44px;flex:0 0 44px;border-radius:13px}
+      #bc-install-nudge .bc-install-copy{flex:1;min-width:0}
+      #bc-install-nudge strong{display:block;font-size:14px;font-weight:800}
+      #bc-install-nudge small{display:block;color:#74748a;font-size:12px;margin-top:2px}
+      #bc-install-nudge .bc-install-actions{display:flex;gap:6px;margin-top:9px;align-items:center}
+      #bc-install-nudge button{font:inherit;border:0;cursor:pointer}
+      #bc-install-nudge .bc-install-cta{background:#6558df;color:#fff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700}
+      #bc-install-nudge .bc-install-dismiss{background:transparent;color:#77768c;padding:7px;font-size:12px}
+      #bc-install-nudge .bc-install-close{align-self:flex-start;background:transparent;color:#85859a;padding:2px;font-size:18px;line-height:1}
+      @keyframes bc-install-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+      @media(prefers-reduced-motion:reduce){#bc-install-nudge.visible{animation:none}}
+      @media(max-width:480px){#bc-install-nudge{right:10px;bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100vw - 20px)}}
+    </style>
   </head>
-  <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
+  <body>
+    <div id="root"></div>
+    <aside id="bc-install-nudge" role="dialog" aria-label="Install BellsConnect" aria-live="polite">
+      <img class="bc-install-icon" src="/bellsconnect-icon.svg" alt="" />
+      <div class="bc-install-copy">
+        <strong>Install BellsConnect</strong>
+        <small>Keep your campus community one tap away.</small>
+        <div class="bc-install-actions"><button id="bc-install-now" class="bc-install-cta" type="button">Install app</button><button id="bc-install-later" class="bc-install-dismiss" type="button">Not now</button></div>
+      </div>
+      <button id="bc-install-close" class="bc-install-close" type="button" aria-label="Dismiss install prompt">×</button>
+    </aside>
+    <script>
+      (() => {
+        const banner = document.getElementById('bc-install-nudge');
+        const installButton = document.getElementById('bc-install-now');
+        const laterButton = document.getElementById('bc-install-later');
+        const closeButton = document.getElementById('bc-install-close');
+        if (!banner || !installButton || !laterButton || !closeButton) return;
+        let installPrompt = null;
+        let fallbackReady = false;
+        const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const wasDismissed = () => { try { return Number(localStorage.getItem('bc-install-dismissed-until') || 0) > Date.now(); } catch { return false; } };
+        const show = () => { if (!isStandalone() && !wasDismissed()) banner.classList.add('visible'); };
+        const dismiss = () => { banner.classList.remove('visible'); try { localStorage.setItem('bc-install-dismissed-until', String(Date.now() + 7 * 24 * 60 * 60 * 1000)); } catch {} };
+        window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt = event; installButton.textContent = 'Install app'; show(); });
+        window.addEventListener('appinstalled', () => { installPrompt = null; banner.classList.remove('visible'); });
+        installButton.addEventListener('click', async () => {
+          if (fallbackReady) { dismiss(); return; }
+          if (installPrompt) {
+            installPrompt.prompt();
+            await installPrompt.userChoice;
+            installPrompt = null;
+            banner.classList.remove('visible');
+          } else {
+            const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            const isSafari = isIOS && /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+            const small = banner.querySelector('small');
+            if (small) small.textContent = isSafari ? 'Tap Share in Safari, then choose “Add to Home Screen”.' : 'Open your browser menu and choose “Install app” or “Add to Home screen”.';
+            installButton.textContent = 'Got it';
+            fallbackReady = true;
+          }
+        });
+        laterButton.addEventListener('click', dismiss);
+        closeButton.addEventListener('click', dismiss);
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+        if (!isStandalone() && !wasDismissed()) window.setTimeout(show, 1800);
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
