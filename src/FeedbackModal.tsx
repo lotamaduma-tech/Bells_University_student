@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { Check, LoaderCircle, MessageSquareText, X } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
-export default function FeedbackModal({ onClose, onSubmitted }: { onClose: () => void; onSubmitted: () => void }) {
-  const [category, setCategory] = useState('suggestion');
+export default function FeedbackModal({ onClose, onSubmitted, initialCategory = 'suggestion' }: { onClose: () => void; onSubmitted: () => void; initialCategory?: 'suggestion'|'bug'|'experience'|'other' }) {
+  const [category, setCategory] = useState(initialCategory);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
