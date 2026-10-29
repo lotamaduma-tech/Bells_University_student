@@ -134,12 +134,10 @@ begin
     dob := null;
   end;
   if dob is null or dob > (current_date - interval '18 years')::date then
-    insert into public.profiles(id, display_name, date_of_birth, status)
-    values (new.id, left(name_value,50), date '1900-01-01', 'incomplete');
-  else
-    insert into public.profiles(id, display_name, date_of_birth, status)
-    values (new.id, left(name_value,50), dob, 'incomplete');
+    raise exception 'Bloom is available only to people aged 18 or older.';
   end if;
+  insert into public.profiles(id, display_name, date_of_birth, status)
+  values (new.id, left(name_value,50), dob, 'incomplete');
   return new;
 end;
 $$;
@@ -172,6 +170,9 @@ create policy "owner inserts own profile" on public.profiles for insert to authe
 with check (id = (select auth.uid()));
 create policy "owner updates own profile" on public.profiles for update to authenticated
 using (id = (select auth.uid())) with check (id = (select auth.uid()));
+-- Prevent clients from changing moderation/verification state or creating arbitrary profile rows.
+revoke insert, update on public.profiles from authenticated;
+grant update(display_name,bio,photo_path,interests,sports,likes,dislikes,relationship_intention,updated_at) on public.profiles to authenticated;
 
 create policy "prompts visible for active profiles" on public.profile_prompts for select to authenticated
 using (exists(select 1 from public.profiles p where p.id=user_id and (p.id=(select auth.uid()) or p.status='active')));
@@ -224,6 +225,51 @@ create policy "reporters see own reports" on public.reports for select to authen
 using(reporter_id=(select auth.uid()));
 create policy "owners manage own preferences" on public.user_preferences for all to authenticated
 using(user_id=(select auth.uid())) with check(user_id=(select auth.uid()));
+
+-- Complete onboarding through a trusted function; clients cannot set status or verification fields directly.
+create or replace function public.complete_profile(
+  display_name_value text,
+  bio_value text,
+  photo_path_value text,
+  interests_value text[],
+  sports_value text[],
+  likes_value text[],
+  dislikes_value text[],
+  intention_value public.relationship_intention
+)
+returns public.profiles language plpgsql security definer set search_path = '' as $
+declare
+  actor uuid := auth.uid();
+  result public.profiles;
+begin
+  if actor is null then raise exception 'Authentication required'; end if;
+  if char_length(trim(coalesce(display_name_value,''))) not between 2 and 50 then raise exception 'Name must be 2 to 50 characters'; end if;
+  if char_length(coalesce(bio_value,'')) > 500 then raise exception 'Bio is too long'; end if;
+  if coalesce(cardinality(interests_value),0)>20 or coalesce(cardinality(sports_value),0)>15
+    or coalesce(cardinality(likes_value),0)>30 or coalesce(cardinality(dislikes_value),0)>30 then
+    raise exception 'Too many profile selections';
+  end if;
+  if photo_path_value is null or split_part(photo_path_value,'/',1) <> actor::text then raise exception 'Upload a profile photo to your own folder'; end if;
+  if not exists(select 1 from public.profiles p where p.id=actor and p.date_of_birth <= (current_date - interval '18 years')::date) then
+    raise exception 'Bloom is available only to people aged 18 or older';
+  end if;
+  update public.profiles set
+    display_name=trim(display_name_value),
+    bio=coalesce(bio_value,''),
+    photo_path=photo_path_value,
+    interests=coalesce(interests_value,'{}'),
+    sports=coalesce(sports_value,'{}'),
+    likes=coalesce(likes_value,'{}'),
+    dislikes=coalesce(dislikes_value,'{}'),
+    relationship_intention=intention_value,
+    status='active',
+    updated_at=now()
+  where id=actor returning * into result;
+  return result;
+end;
+$;
+revoke all on function public.complete_profile(text,text,text,text[],text[],text[],text[],public.relationship_intention) from public;
+grant execute on function public.complete_profile(text,text,text,text[],text[],text[],text[],public.relationship_intention) to authenticated;
 
 -- Atomic like/match creation. A mutual match creates one conversation and both membership rows.
 create or replace function public.record_like(target_user uuid, decision_value text)
