@@ -4,7 +4,7 @@ export type BloomProfile = {
   id:string; display_name:string; age:number; bio:string; photo_path:string|null;
   interests:string[]; sports:string[]; likes:string[]; dislikes:string[];
   relationship_intention:string|null; affiliation_status:string; status:string;
-  age:number; photo_url:string|null;
+  photo_url:string|null;
 };
 export type BloomMessage = { id:string; conversation_id:string; sender_id:string; body:string; created_at:string; edited_at:string|null; deleted_at:string|null };
 
