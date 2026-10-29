@@ -75,7 +75,7 @@ export default function AuthGate() {
   const submitAuth = async (event:FormEvent) => {
     event.preventDefault(); setError(''); setNotice('');
     if (!supabase) { setError('Backend setup is not finished yet. Bloom needs its dedicated Supabase project and environment values.'); return; }
-    if (password.length < 10) { setError('Use a password with at least 10 characters.'); return; }
+    if (password.length < 6) { setError('Use a password with at least 6 characters.'); return; }
     if (authMode==='signup') {
       if (!displayName.trim() || !dob) { setError('Enter your name and date of birth to continue.'); return; }
       if (dob > age18Date()) { setError('Bloom is only available to adults aged 18 and above.'); return; }
