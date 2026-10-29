@@ -1,27 +1,55 @@
-# Vibe — Bells University-first dating prototype
+# Bloom — Bells University-first dating app
 
-Vibe is a mobile-first dating experience prototype. The initial build uses fictional adult demo profiles and local browser persistence. It does not provide real accounts, remote matching, verification, or cross-device messaging yet.
+Bloom is a mobile-first, campus-focused dating app project for adults aged 18 and over. The current UI prototype contains fictional sample profiles; those samples are not real members. Real discovery and cross-device messaging are not enabled until the dedicated Bloom Supabase project is created and the data-backed screens are connected.
 
 ## Run locally
 
-1. Install Node.js (LTS).
+1. Install Node.js LTS.
 2. Run `npm install`.
-3. Run `npm run dev`.
-4. Open the local URL printed by Vite.
+3. Copy `.env.example` to `.env.local`.
+4. Add the dedicated Bloom Supabase project URL and publishable key after the project has been created.
+5. Run `npm run dev` and open the local URL Vite prints.
 
-## Current prototype features
+Never add a Supabase `service_role` key or any secret key to frontend environment variables or Git.
 
-- Discovery feed with the requested gesture mapping: swipe left = accept, right = decline, down = next.
-- Accessible Accept / Decline / Next controls and undo.
-- Profile detail modal, Accepted list, local demo chats, profile editor and discovery filters.
-- Local persistence for demo decisions, messages, profile edits and filters.
-- Reduced-motion support, keyboard-friendly controls, responsive mobile/desktop layouts.
-- Report/block controls in profile details (local demo behavior only).
+## Current implementation
 
-## Backend status
+- Bloom welcome/intro screen and sign-up/login UI.
+- Adult-only (18+) date-of-birth check in the UI and database signup trigger.
+- Email verification flow (requires email confirmation to be enabled in Supabase Auth).
+- Profile onboarding: display name, profile photo, bio, interests, sports, likes, dislikes, and relationship intention.
+- Private profile-photo bucket with owner upload policies.
+- SQL schema for profiles, preferences, likes, mutual matches, conversations, members, messages, blocks, reports and profile prompts.
+- Database functions for secure profile completion and atomic mutual-match creation.
+- Client service functions for discovery profile loading, match decisions, message history, sending messages and Realtime message subscriptions.
 
-No Supabase project has been selected for Vibe yet. The currently connected Supabase projects visible to the integration are named for other products, so this prototype does not connect to or modify them. Real auth, storage, matching, moderation, and messaging require a dedicated Vibe backend and server-enforced Row Level Security.
+## Supabase setup
 
-## Design note
+The initial migration is in `supabase/migrations/202610290001_bloom_initial_schema.sql`.
 
-The supplied reference image is pastel pink/ivory, while the written specification explicitly defines a dark palette (#0B0B0F, #15151B, #FF3D70). This implementation follows the written hex palette while retaining the reference's romantic, rounded visual language. The palette can be switched once you confirm which direction is final.
+**Only apply this migration to a dedicated Bloom Supabase project. Do not apply it to Adumex AI or NectarSpend.**
+
+After the project is created:
+
+1. Open its SQL Editor or apply the migration with the Supabase migration workflow.
+2. Confirm email verification is enabled in Authentication settings.
+3. Copy the project URL and publishable key into `.env.local` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+4. Test signup with a dedicated test account, complete onboarding, and verify that unauthenticated users cannot read profile or chat data.
+5. Test messaging with two verified adult test accounts and confirm that only mutual matches can create a conversation.
+
+## Security notes
+
+- The frontend publishable key is intended for browser use; database access must be constrained by RLS.
+- Never trust frontend checks alone for age, matching or conversation membership.
+- Profile images are stored in a private bucket.
+- The database only creates a conversation after a mutual like.
+- Report submission is stored in the database, but an operational moderation workflow and response process still need to be established.
+- University affiliation verification is not yet implemented; do not label members as university-verified until a real verification process exists.
+- The prototype still contains fictional sample discovery profiles and local demo chat UI; do not present those as real members or live messages.
+
+## Build
+
+```bash
+npm install
+npm run build
+```
