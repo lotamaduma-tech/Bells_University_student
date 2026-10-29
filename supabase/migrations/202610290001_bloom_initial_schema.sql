@@ -11,7 +11,7 @@ create type public.relationship_intention as enum ('meaningful_relationship','da
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text not null check (char_length(trim(display_name)) between 2 and 50),
-  date_of_birth date not null,
+  age smallint not null default 18 check (age >= 18 and age <= 120),
   bio text not null default '' check (char_length(bio) <= 500),
   photo_path text,
   interests text[] not null default '{}' check (cardinality(interests) <= 20),
@@ -23,8 +23,14 @@ create table public.profiles (
   affiliation_status public.verification_status not null default 'unverified',
   status public.profile_status not null default 'incomplete',
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint profile_must_be_adult check (date_of_birth <= (current_date - interval '18 years')::date)
+  updated_at timestamptz not null default now()
+);
+
+-- Date of birth is private and never exposed through the public discovery profile row.
+create table public.private_profile_data (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  date_of_birth date not null check (date_of_birth <= (current_date - interval '18 years')::date),
+  created_at timestamptz not null default now()
 );
 
 create table public.profile_prompts (
@@ -136,8 +142,9 @@ begin
   if dob is null or dob > (current_date - interval '18 years')::date then
     raise exception 'Bloom is available only to people aged 18 or older.';
   end if;
-  insert into public.profiles(id, display_name, date_of_birth, status)
-  values (new.id, left(name_value,50), dob, 'incomplete');
+  insert into public.profiles(id, display_name, status)
+  values (new.id, left(name_value,50), 'incomplete');
+  insert into public.private_profile_data(user_id,date_of_birth) values(new.id,dob);
   return new;
 end;
 $$;
@@ -146,6 +153,7 @@ for each row execute function public.handle_new_user();
 
 -- Profile reads expose only active profiles to other signed-in members; owners can read their own incomplete profile.
 alter table public.profiles enable row level security;
+alter table public.private_profile_data enable row level security;
 alter table public.profile_prompts enable row level security;
 alter table public.likes enable row level security;
 alter table public.matches enable row level security;
@@ -165,6 +173,9 @@ returns boolean language sql stable security definer set search_path = '' as $
 $;
 revoke all on function public.is_blocked_between(uuid,uuid) from public;
 grant execute on function public.is_blocked_between(uuid,uuid) to authenticated;
+
+create policy "owners can read private birth date" on public.private_profile_data
+for select to authenticated using(user_id=(select auth.uid()));
 
 create policy "profile visible to owner or active members" on public.profiles
 for select to authenticated using (
@@ -266,10 +277,11 @@ begin
     raise exception 'Too many profile selections';
   end if;
   if photo_path_value is null or split_part(photo_path_value,'/',1) <> actor::text then raise exception 'Upload a profile photo to your own folder'; end if;
-  if not exists(select 1 from public.profiles p where p.id=actor and p.date_of_birth <= (current_date - interval '18 years')::date) then
+  if not exists(select 1 from public.private_profile_data pp where pp.user_id=actor and pp.date_of_birth <= (current_date - interval '18 years')::date) then
     raise exception 'Bloom is available only to people aged 18 or older';
   end if;
   update public.profiles set
+    age=(select extract(year from age(current_date,pp.date_of_birth))::smallint from public.private_profile_data pp where pp.user_id=actor),
     display_name=trim(display_name_value),
     bio=coalesce(bio_value,''),
     photo_path=photo_path_value,
