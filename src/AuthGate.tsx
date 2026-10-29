@@ -38,12 +38,13 @@ export default function AuthGate() {
 
   useEffect(() => {
     if (!supabase) { setStage('welcome'); return; }
+    const client = supabase;
     let alive = true;
     const syncSession = async (next:Session|null) => {
       if (!alive) return;
       setSession(next);
       if (!next) { setStage('welcome'); return; }
-      const {data,error:profileError} = await supabase.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
+      const {data,error:profileError} = await client.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
       if (!alive) return;
       if (profileError) {
         setError('We could not load your Bloom profile. Confirm the database migration has been applied.');
@@ -56,8 +57,8 @@ export default function AuthGate() {
         setStage('onboarding');
       }
     };
-    supabase.auth.getSession().then(({data}) => syncSession(data.session));
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((_event,next) => { void syncSession(next); });
+    client.auth.getSession().then(({data}) => syncSession(data.session));
+    const {data:{subscription}} = client.auth.onAuthStateChange((_event,next) => { void syncSession(next); });
     return () => { alive = false; subscription.unsubscribe(); };
   }, []);
 
