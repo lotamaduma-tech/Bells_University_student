@@ -103,3 +103,16 @@
 }
 @media(max-width:380px){.bc-discover-rail .bc-person{flex-basis:82vw}}
 @media(prefers-reduced-motion:reduce){.bc-discover-rail{scroll-behavior:auto}}
+
+
+/* Private developer feedback */
+.bc-feedback-modal{width:min(100%,520px)}
+.bc-feedback-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#e7f5ec;color:#24734f;margin-bottom:13px}
+.bc-feedback-modal .bc-profile-form{gap:12px}
+.bc-feedback-modal .bc-profile-form .bc-btn{width:100%;justify-content:center}
+.bc-feedback-count{font-size:10px;line-height:1.5;color:var(--bc-muted,#68736e)}
+.bc-feedback-error{margin:0!important;padding:10px 12px;background:#fff0f2;border-radius:10px;color:#b72d4d!important}
+.bc-feedback-success{text-align:center;padding:16px 2px 4px}
+.bc-feedback-success>span{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 16px;border-radius:18px;background:#e7f5ec;color:#24734f}
+.bc-feedback-success .bc-btn{margin-top:12px;min-width:140px}
+.bc-theme-dark .bc-feedback-icon,.bc-theme-dark .bc-feedback-success>span{background:#203a2d;color:#9de0b8}
