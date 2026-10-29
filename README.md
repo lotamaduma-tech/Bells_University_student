@@ -1,55 +1,50 @@
-# Bloom — Bells University-first dating app
+# BellsConnect — Bells University campus social network
 
-Bloom is a mobile-first, campus-focused dating app project for adults aged 18 and over. The current UI prototype contains fictional sample profiles; those samples are not real members. The dedicated Bloom Supabase project has been created. The frontend must be redeployed after configuring its Vercel environment variables; full registration, profile upload, matching, and cross-device messaging still require end-to-end testing.
+BellsConnect is a campus-first social network for Bells University of Technology students. It is designed for students aged 16 and above and focuses on meeting classmates, finding study/activity partners, connecting by username, messaging accepted connections, and planning meet-ups at public campus locations.
 
 ## Run locally
 
 1. Install Node.js LTS.
 2. Run `npm install`.
 3. Copy `.env.example` to `.env.local`.
-4. Add the dedicated Bloom Supabase project URL and publishable key to `.env.local` for local development. These variables are also configured in Vercel for production, preview, and development.
+4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` using the BellsConnect Supabase project values.
 5. Run `npm run dev` and open the local URL Vite prints.
 
-Never add a Supabase `service_role` key or any secret key to frontend environment variables or Git.
+Never add a Supabase `service_role` key or secret key to frontend environment variables or Git.
 
-## Current implementation
+## Current features
 
-- Bloom welcome/intro screen and sign-up/login UI.
-- Adult-only (18+) date-of-birth check in the UI and database signup trigger.
-- Email verification flow (requires email confirmation to be enabled in Supabase Auth).
-- Profile onboarding: display name, profile photo, bio, interests, sports, likes, dislikes, and relationship intention.
-- Private profile-photo bucket with owner upload policies.
-- SQL schema for profiles, preferences, likes, mutual matches, conversations, members, messages, blocks, reports and profile prompts.
-- Database functions for secure profile completion and atomic mutual-match creation.
-- Client service functions for discovery profile loading, match decisions, message history, sending messages and Realtime message subscriptions.
+- Responsive desktop/mobile BellsConnect interface.
+- Supabase email/password sign-up and login.
+- 16+ date-of-birth validation in the client and database trigger, with no arbitrary upper age limit.
+- Real member profiles only; no seeded demo discovery profiles.
+- Generated unique usernames and username/name/interest search.
+- Connection requests, acceptance/decline, and private real-time messaging for accepted connections.
+- Shareable member profile links (the viewer must sign in).
+- Campus meet-up plans using public campus locations.
+- Food-spot discovery links for known on-campus listings; names and opening details should be verified by students before relying on them.
+- RLS-backed Bells-only profile visibility, connections, chats, meet-ups, and profile-photo access.
 
-## Supabase setup
+## Supabase configuration still required
 
-The initial migration is in `supabase/migrations/202610290001_bloom_initial_schema.sql`.
+The connected Supabase database schema has been updated. Email confirmation is controlled by Supabase Auth settings, not the frontend. To allow sign-up without an email verification link, open [Supabase Auth Providers](https://supabase.com/dashboard/project/gxiirebjidkgucucegzn/auth/providers) and disable **Confirm email** for the Email provider. Then test sign-up and sign-in using a fresh test account.
 
-**Only apply this migration to a dedicated Bloom Supabase project. Do not apply it to Adumex AI or NectarSpend.**
+Disabling email confirmation means email ownership is not verified. BellsConnect does not yet have an automated student-record verification integration, so do not describe accounts as institution-verified. A student verification/moderation workflow should be added before a broad launch.
 
-After the project is created:
+## Database migrations
 
-1. Open its SQL Editor or apply the migration with the Supabase migration workflow.
-2. Confirm email verification is enabled in Authentication settings.
-3. Copy the project URL and publishable key into `.env.local` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
-4. Test signup with a dedicated test account, complete onboarding, and verify that unauthenticated users cannot read profile or chat data.
-5. Test messaging with two verified adult test accounts and confirm that only mutual matches can create a conversation.
+- `supabase/migrations/202610290001_bloom_initial_schema.sql` — original baseline schema.
+- `supabase/migrations/202610290004_bellsconnect_campus_social.sql` — 16+ policy and campus social tables.
+- `supabase/migrations/202610290005_bellsconnect_usernames.sql` — unique usernames.
+- `supabase/migrations/202610290006_bellsconnect_isolate_campus.sql` — Bells-only profile visibility and indexes.
 
-## Security notes
+These migrations target the dedicated BellsConnect/Bloom Supabase project only. Never apply them to Adumex AI or NectarSpend.
 
-- The frontend publishable key is intended for browser use; database access must be constrained by RLS.
-- Never trust frontend checks alone for age, matching or conversation membership.
-- Profile images are stored in a private bucket.
-- The database only creates a conversation after a mutual like.
-- Report submission is stored in the database, but an operational moderation workflow and response process still need to be established.
-- University affiliation verification is not yet implemented; do not label members as university-verified until a real verification process exists.
-- The prototype still contains fictional sample discovery profiles and local demo chat UI; do not present those as real members or live messages.
-
-## Build
+## Build check
 
 ```bash
 npm install
 npm run build
 ```
+
+The GitHub Actions build check is required before merging changes. End-to-end sign-up, realtime chat, and meetup flows still need testing with two real test accounts on the deployed preview.
