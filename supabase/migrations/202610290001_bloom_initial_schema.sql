@@ -166,11 +166,11 @@ alter table public.user_preferences enable row level security;
 
 -- Security-definer helper avoids RLS hiding the other member's block record.
 create or replace function public.is_blocked_between(user_a uuid,user_b uuid)
-returns boolean language sql stable security definer set search_path = '' as $
+returns boolean language sql stable security definer set search_path = '' as $$
   select exists(select 1 from public.blocks b
     where (b.blocker_id=user_a and b.blocked_id=user_b)
        or (b.blocker_id=user_b and b.blocked_id=user_a));
-$;
+$$;
 revoke all on function public.is_blocked_between(uuid,uuid) from public;
 grant execute on function public.is_blocked_between(uuid,uuid) to authenticated;
 
@@ -214,10 +214,10 @@ using(user_low=(select auth.uid()) or user_high=(select auth.uid()));
 -- Match creation is intentionally performed by a trusted database function, not arbitrary client inserts.
 
 create or replace function public.is_conversation_member(conversation_id_value uuid)
-returns boolean language sql stable security definer set search_path = '' as $
+returns boolean language sql stable security definer set search_path = '' as $$
   select exists(select 1 from public.conversation_members cm
     where cm.conversation_id=conversation_id_value and cm.user_id=(select auth.uid()));
-$;
+$$;
 revoke all on function public.is_conversation_member(uuid) from public;
 grant execute on function public.is_conversation_member(uuid) to authenticated;
 
@@ -261,7 +261,7 @@ create or replace function public.complete_profile(
   dislikes_value text[],
   intention_value public.relationship_intention
 )
-returns public.profiles language plpgsql security definer set search_path = '' as $
+returns public.profiles language plpgsql security definer set search_path = '' as $$
 declare
   actor uuid := auth.uid();
   result public.profiles;
@@ -295,7 +295,7 @@ begin
   where id=actor returning * into result;
   return result;
 end;
-$;
+$$;
 revoke all on function public.complete_profile(text,text,text,text[],text[],text[],text[],public.relationship_intention) from public;
 grant execute on function public.complete_profile(text,text,text,text[],text[],text[],text[],public.relationship_intention) to authenticated;
 
