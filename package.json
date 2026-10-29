@@ -1,9 +1,25 @@
 {
-  "name": "vibe-campus-dating",
+  "name": "bloom-campus-dating",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "dev": "vite --host 0.0.0.0", "build": "tsc -b && vite build", "preview": "vite preview --host 0.0.0.0" },
-  "dependencies": { "lucide-react": "0.468.0", "motion": "12.23.24", "react": "19.1.1", "react-dom": "19.1.1" },
-  "devDependencies": { "@types/react": "19.1.10", "@types/react-dom": "19.1.7", "@vitejs/plugin-react": "5.0.2", "typescript": "5.9.2", "vite": "7.1.4" }
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "0.468.0",
+    "motion": "12.23.24",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "@supabase/supabase-js": "^2.57.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "@vitejs/plugin-react": "5.0.2",
+    "typescript": "5.9.2",
+    "vite": "7.1.4"
+  }
 }
