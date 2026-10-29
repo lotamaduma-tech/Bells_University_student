@@ -268,3 +268,56 @@
  .bc-reaction{min-width:27px;height:26px}
 }
 @media(prefers-reduced-motion:reduce){.bc-cover-photo-action,.bc-reaction{transition:none}}
+
+
+/* Inbox and conversation polish */
+.bc-messages-heading{margin-bottom:18px}
+.bc-messages-heading h1{margin-bottom:5px}
+.bc-conversation-list{display:flex;flex-direction:column;gap:0;max-width:760px;border:1px solid var(--bc-border);border-radius:18px;overflow:hidden;background:var(--bc-card)}
+.bc-conversation-row{width:100%;display:flex;align-items:center;gap:13px;text-align:left;padding:14px 17px;background:transparent;border:0;border-bottom:1px solid var(--bc-border);color:var(--bc-ink);cursor:pointer;transition:background .15s}
+.bc-conversation-row:last-child{border-bottom:0}
+.bc-conversation-row:hover{background:var(--bc-bg)}
+.bc-conversation-row .bc-avatar{width:47px;height:47px;flex:0 0 47px}
+.bc-conversation-person{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.bc-conversation-person strong{font-size:13px;font-weight:780}
+.bc-conversation-person small{font-size:11px;color:var(--bc-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-conversation-row>svg{color:var(--bc-muted)}
+.bc-empty-simple{padding:34px 20px;text-align:center}
+.bc-empty-simple h3{margin:0 0 8px}
+.bc-empty-simple p{color:var(--bc-muted);font-size:12px}
+.bc-chat-chatline{display:none!important}
+.bc-chat-messages{display:flex;flex-direction:column;gap:11px}
+.bc-message{touch-action:pan-y;user-select:text;-webkit-user-select:text}
+.bc-message-wrap{position:relative}
+.bc-reaction-popover{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:100%;padding:6px 8px;margin:4px 0;background:var(--bc-card);border:1px solid var(--bc-border);border-radius:999px;box-shadow:0 8px 24px #16152b18;z-index:3}
+.bc-reaction-popover button{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;border:0;border-radius:50%;background:transparent;font-size:18px}
+.bc-reaction-popover button:hover{background:var(--bc-bg)}
+.bc-reaction-popover .bc-reply-action{padding:0 10px;border-radius:99px;font-size:11px;color:var(--bc-ink);font-weight:750}
+.bc-reply-composer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;margin-bottom:8px;background:var(--bc-bg);border-left:3px solid #8c7df2;border-radius:10px}
+.bc-reply-composer>span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bc-reply-composer b{font-size:11px;color:var(--bc-ink)}
+.bc-reply-composer small{font-size:11px;color:var(--bc-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:min(65vw,460px)}
+.bc-reply-composer>button{display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--bc-muted);padding:5px}
+.bc-reply-context{font-size:10px;color:var(--bc-muted);padding:3px 8px}
+.bc-profile-privacy{max-width:760px;margin:18px auto;padding:17px 19px;border:1px solid var(--bc-border);border-radius:16px;background:var(--bc-card)}
+.bc-profile-privacy>div{display:flex;align-items:flex-start;gap:11px}
+.bc-profile-privacy>div>svg{flex:0 0 auto;color:#7c70d9;margin-top:2px}
+.bc-profile-privacy span{display:flex;flex-direction:column;gap:6px}
+.bc-profile-privacy strong{font-size:12px;color:var(--bc-ink)}
+.bc-profile-privacy small,.bc-profile-privacy p{font-size:11px;line-height:1.7;color:var(--bc-muted)}
+.bc-profile-privacy p{margin:11px 0 0;padding-top:11px;border-top:1px solid var(--bc-border)}
+.bc-my-profile{isolation:isolate;overflow:hidden}
+.bc-my-profile .bc-profile-form,.bc-my-profile .bc-my-profile-body{position:relative;z-index:1;min-width:0}
+.bc-my-profile .bc-profile-form input,.bc-my-profile .bc-profile-form textarea{box-sizing:border-box;max-width:100%;font-family:inherit}
+.bc-my-profile .bc-photo-edit{box-sizing:border-box;max-width:100%}
+.bc-my-profile .bc-avatar-xl img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.bc-my-profile .bc-profile-form>label{min-width:0}
+.bc-my-profile .bc-profile-form>label input,.bc-my-profile .bc-profile-form>label textarea{box-sizing:border-box}
+.bc-theme-dark .bc-profile-privacy{background:var(--bc-card);border-color:var(--bc-border)}
+@media(max-width:640px){
+ .bc-conversation-list{border-radius:15px}
+ .bc-conversation-row{padding:13px 12px;gap:11px}
+ .bc-conversation-row .bc-avatar{width:43px;height:43px;flex-basis:43px}
+ .bc-profile-privacy{padding:15px;margin-top:14px}
+ .bc-reaction-popover{max-width:calc(100vw - 64px)}
+}
