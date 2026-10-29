@@ -7,8 +7,8 @@ import App from './App';
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
 type Intention = 'meaningful_relationship' | 'dating_with_intention' | 'open_to_relationship' | 'see_where_it_goes';
 const intentions: {value:Intention;label:string}[] = [
-  {value:'meaningful_relationship',label:'A campus community'},
-  {value:'dating_with_intention',label:'Make campus friends'},
+  {value:'meaningful_relationship',label:'Campus community'},
+  {value:'dating_with_intention',label:'Campus friends'},
   {value:'open_to_relationship',label:'Study / activity partners'},
   {value:'see_where_it_goes',label:'Meet new people'}
 ];
@@ -47,7 +47,7 @@ export default function AuthGate() {
       const {data,error:profileError} = await client.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
       if (!alive) return;
       if (profileError) {
-        setError('We could not load your Bloom profile. Confirm the database migration has been applied.');
+        setError('We could not load your BellsConnect profile. Confirm the database setup is complete.');
         setStage('onboarding');
       } else if (data?.status === 'active') {
         setDisplayName(data.display_name || next.user.user_metadata?.display_name || '');
