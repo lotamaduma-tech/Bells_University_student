@@ -52,6 +52,7 @@
         const closeButton = document.getElementById('bc-install-close');
         if (!banner || !installButton || !laterButton || !closeButton) return;
         let installPrompt = null;
+        let fallbackReady = false;
         const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         const wasDismissed = () => { try { return Number(localStorage.getItem('bc-install-dismissed-until') || 0) > Date.now(); } catch { return false; } };
         const show = () => { if (!isStandalone() && !wasDismissed()) banner.classList.add('visible'); };
@@ -59,6 +60,7 @@
         window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt = event; installButton.textContent = 'Install app'; show(); });
         window.addEventListener('appinstalled', () => { installPrompt = null; banner.classList.remove('visible'); });
         installButton.addEventListener('click', async () => {
+          if (fallbackReady) { dismiss(); return; }
           if (installPrompt) {
             installPrompt.prompt();
             await installPrompt.userChoice;
@@ -70,7 +72,7 @@
             const small = banner.querySelector('small');
             if (small) small.textContent = isSafari ? 'Tap Share in Safari, then choose “Add to Home Screen”.' : 'Open your browser menu and choose “Install app” or “Add to Home screen”.';
             installButton.textContent = 'Got it';
-            installButton.onclick = dismiss;
+            fallbackReady = true;
           }
         });
         laterButton.addEventListener('click', dismiss);
