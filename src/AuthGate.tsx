@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
-import { ArrowRight, ArrowLeft, Heart, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
 import App from './App';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
@@ -149,12 +149,12 @@ export default function AuthGate() {
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
     <header className="bloom-auth-header">
-      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><Flower2 size={19}/></span>bloom<span>.</span></button>
+      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><Flower2 size={19}/></span>Bells<span>Connect</span></button>
       <span className="bloom-campus"><span/> BELLS UNIVERSITY</span>
     </header>
     <main className="bloom-auth-main">
       {stage==='welcome' && <section className="bloom-welcome">
-        <div className="bloom-orbit-art" aria-hidden="true"><div className="bloom-orbit orbit-a"/><div className="bloom-orbit orbit-b"/><div className="bloom-heart"><Heart fill="currentColor" strokeWidth={1.2}/></div><span className="bloom-spark spark-a">✦</span><span className="bloom-spark spark-b">✧</span><span className="bloom-spark spark-c">✦</span><span className="bloom-art-caption">REAL PEOPLE. REAL CONNECTIONS.</span></div>
+        <div className="bloom-orbit-art" aria-hidden="true"><div className="bloom-orbit orbit-a"/><div className="bloom-orbit orbit-b"/><div className="bloom-heart"><Users strokeWidth={1.5}/></div><span className="bloom-spark spark-a">✦</span><span className="bloom-spark spark-b">✧</span><span className="bloom-spark spark-c">✦</span><span className="bloom-art-caption">REAL PEOPLE. REAL CONNECTIONS.</span></div>
         <p className="bloom-eyebrow"><Sparkles size={14}/> YOUR CAMPUS, A LITTLE CLOSER</p>
         <h1>Your campus,<br/>your <em>people.</em></h1>
         <p className="bloom-welcome-copy">Meet real Bells students, find people who share your interests, plan a campus hangout, or find a study partner.</p>
@@ -166,7 +166,7 @@ export default function AuthGate() {
       {stage==='auth' && <section className="bloom-form-panel">
         <button className="bloom-back-link" onClick={()=>{setStage('welcome');setError('')}}><ArrowLeft size={16}/> Back</button>
         <p className="bloom-eyebrow"><Sparkles size={14}/> {authMode==='signup'?'YOUR NEXT CHAPTER':'WELCOME BACK'}</p>
-        <h1>{authMode==='signup'?'Let’s get you blooming.':'Good to see you again.'}</h1>
+        <h1>{authMode==='signup'?'Let’s get you connected.':'Good to see you again.'}</h1>
         <p className="bloom-form-intro">{authMode==='signup'?'Create your account to start building a profile that feels like you.':'Log in to pick up where you left off.'}</p>
         <div className="bloom-mode-switch"><button className={authMode==='signup'?'active':''} onClick={()=>{setAuthMode('signup');setError('')}}>Create account</button><button className={authMode==='login'?'active':''} onClick={()=>{setAuthMode('login');setError('')}}>Log in</button></div>
         <form onSubmit={submitAuth} className="bloom-form">
