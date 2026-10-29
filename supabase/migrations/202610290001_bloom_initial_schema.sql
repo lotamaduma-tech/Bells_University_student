@@ -156,14 +156,20 @@ alter table public.blocks enable row level security;
 alter table public.reports enable row level security;
 alter table public.user_preferences enable row level security;
 
+-- Security-definer helper avoids RLS hiding the other member's block record.
+create or replace function public.is_blocked_between(user_a uuid,user_b uuid)
+returns boolean language sql stable security definer set search_path = '' as $
+  select exists(select 1 from public.blocks b
+    where (b.blocker_id=user_a and b.blocked_id=user_b)
+       or (b.blocker_id=user_b and b.blocked_id=user_a));
+$;
+revoke all on function public.is_blocked_between(uuid,uuid) from public;
+grant execute on function public.is_blocked_between(uuid,uuid) to authenticated;
+
 create policy "profile visible to owner or active members" on public.profiles
 for select to authenticated using (
   id = (select auth.uid()) or (
-    status = 'active' and not exists (
-      select 1 from public.blocks b
-      where (b.blocker_id = (select auth.uid()) and b.blocked_id = profiles.id)
-         or (b.blocker_id = profiles.id and b.blocked_id = (select auth.uid()))
-    )
+    status = 'active' and not public.is_blocked_between((select auth.uid()),profiles.id)
   )
 );
 create policy "owner inserts own profile" on public.profiles for insert to authenticated
@@ -215,10 +221,9 @@ create policy "members send messages to matched conversations" on public.message
 with check(sender_id=(select auth.uid())
   and public.is_conversation_member(conversation_id)
   and not exists(
-    select 1 from public.conversation_members mine
-    join public.conversation_members other on other.conversation_id=mine.conversation_id and other.user_id<>mine.user_id
-    join public.blocks b on (b.blocker_id=mine.user_id and b.blocked_id=other.user_id) or (b.blocker_id=other.user_id and b.blocked_id=mine.user_id)
-    where mine.conversation_id=messages.conversation_id and mine.user_id=(select auth.uid())
+    select 1 from public.conversation_members other
+    where other.conversation_id=messages.conversation_id and other.user_id<>(select auth.uid())
+      and public.is_blocked_between((select auth.uid()),other.user_id)
   ));
 create policy "sender edits own messages" on public.messages for update to authenticated
 using(sender_id=(select auth.uid())) with check(sender_id=(select auth.uid()));
