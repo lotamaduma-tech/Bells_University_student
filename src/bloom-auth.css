@@ -58,3 +58,34 @@
 .bloom-input-wrap:has(input[type="password"]):focus-within{border-color:#d84f78;box-shadow:0 0 0 3px #d84f781c}
 .bloom-input-wrap input[type="password"]{color:#211d29!important;background:#fff!important;-webkit-text-fill-color:#211d29!important;caret-color:#211d29}
 .bloom-input-wrap input[type="password"]::placeholder{color:#8b8593!important;-webkit-text-fill-color:#8b8593!important;opacity:1}
+
+
+/* Ensure every auth field has accessible contrast, including email and date inputs. */
+.bloom-form label input,
+.bloom-form label textarea,
+.bloom-form label select,
+.bloom-form .bloom-input-wrap input,
+.bloom-form-panel input,
+.bloom-form-panel textarea,
+.bloom-form-panel select {
+  color: #211d29 !important;
+  -webkit-text-fill-color: #211d29 !important;
+  background-color: #fff !important;
+  caret-color: #6554d9 !important;
+}
+.bloom-form .bloom-input-wrap input::placeholder,
+.bloom-form-panel input::placeholder,
+.bloom-form-panel textarea::placeholder {
+  color: #8b8593 !important;
+  -webkit-text-fill-color: #8b8593 !important;
+  opacity: 1 !important;
+}
+.bloom-form .bloom-input-wrap { background: #fff !important; }
+.bloom-form .bloom-input-wrap > svg { color: #6f6878; flex: 0 0 auto; }
+.bloom-form input:-webkit-autofill,
+.bloom-form input:-webkit-autofill:hover,
+.bloom-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #211d29 !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  caret-color: #211d29 !important;
+}
