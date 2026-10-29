@@ -1,13 +1,8 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
-import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from './lib/supabase';
 import { ArrowRight, ArrowLeft, Heart, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
 import App from './App';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
-const supabase: SupabaseClient | null = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-}) : null;
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
 type Intention = 'meaningful_relationship' | 'dating_with_intention' | 'open_to_relationship' | 'see_where_it_goes';
