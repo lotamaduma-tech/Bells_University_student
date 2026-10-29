@@ -14,3 +14,41 @@
 .bloom-confirm-panel{text-align:center}.bloom-confirm-panel .bloom-eyebrow{justify-content:center;margin-top:20px}.bloom-confirm-panel .bloom-form-intro{text-align:center;margin:14px auto 24px}.bloom-confirm-icon{width:60px;height:60px;margin:0 auto 17px;border-radius:20px;display:grid;place-items:center;background:#ff3d7019;color:#ff91ad;border:1px solid #ff3d7033}
 .bloom-progress{display:flex;gap:5px;margin:0 0 25px}.bloom-progress span{height:3px;flex:1;border-radius:99px;background:#ff7195}.bloom-photo-upload{height:190px;position:relative;display:grid;place-items:center;border:1px dashed #5a3d4c;border-radius:17px;overflow:hidden;background:#19151d;cursor:pointer}.bloom-photo-upload input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2}.bloom-photo-upload>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.bloom-photo-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:#ff91ad}.bloom-photo-placeholder strong{font-size:12px;color:#f2eaf1}.bloom-photo-placeholder small{font-size:10px;color:#99909f}.bloom-photo-edit{position:absolute;right:11px;bottom:11px;z-index:1;width:33px;height:33px;border-radius:11px;display:grid;place-items:center;background:#ff3d70;color:white}
 .bloom-auth-footer{width:min(100%,1050px);margin:0 auto;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #ffffff0d;color:#77717f;font-size:9px}.bloom-auth-footer span:last-child{display:flex;align-items:center;gap:6px}.bloom-auth-footer svg{color:#ff91ad}.bloom-loading{min-height:100dvh;display:flex;align-items:center;justify-content:center;gap:12px;background:#0b0b0f;color:white;font:800 25px Manrope,sans-serif}.bloom-loading>strong>span{color:#ff7195}.bloom-spinner{animation:bloom-spin 1s linear infinite}@keyframes bloom-spin{to{transform:rotate(360deg)}}@keyframes bloom-breathe{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(-5deg) scale(1.045)}}@keyframes bloom-fade-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}@media(min-width:700px){.bloom-auth-shell{padding-left:35px;padding-right:35px}.bloom-auth-header{height:80px}.bloom-auth-main{padding:36px 0}.bloom-welcome{max-width:440px}.bloom-orbit-art{height:250px}.bloom-form-panel{padding:18px 0}.bloom-onboarding-panel{max-width:520px}.bloom-auth-footer{min-height:50px}}@media(max-height:760px){.bloom-orbit-art{height:170px}.bloom-heart{width:80px;height:80px}.bloom-heart svg{width:44px;height:44px}.bloom-welcome h1{font-size:38px}.bloom-welcome-copy{margin:12px auto}.bloom-auth-main{padding-top:16px;padding-bottom:20px}}@media(prefers-reduced-motion:reduce){.bloom-heart,.bloom-spinner{animation:none}.bloom-form-panel{animation:none}.bloom-cta{transition:none}}
+
+/* BellsConnect identity and light authentication theme */
+.bloom-auth-shell{background:radial-gradient(ellipse at 50% 4%,#efedff 0,transparent 43%),#f7f7fb;color:#242333}
+.bloom-auth-header{border-bottom-color:#e8e6f1}
+.bloom-wordmark{color:#242333}
+.bloom-wordmark>span:last-child{color:#6554d9;margin-left:-5px}
+.bloom-logo-mark{background:linear-gradient(140deg,#8377f2,#5d4bd3);box-shadow:0 6px 20px #6554d92e}
+.bloom-campus{color:#5f6071;background:#fff;border-color:#e4e2ef}
+.bloom-auth-glow{opacity:.11}
+.bloom-glow-one{background:#8377f2}.bloom-glow-two{background:#b9b0ff}
+.bloom-orbit{border-color:#8c80ee38}.orbit-b{border-color:#b3aaff4a}
+.bloom-heart{background:linear-gradient(145deg,#9186f7,#6554d9);box-shadow:0 20px 70px #6554d930}
+.bloom-spark{color:#7567df}.spark-b{color:#aa80c9}
+.bloom-art-caption{color:#8b8a9d}
+.bloom-eyebrow{color:#6554d9}
+.bloom-welcome-copy,.bloom-form-intro{color:#747487}
+.bloom-trust-row{color:#666779}.bloom-trust-row svg{color:#6554d9}
+.bloom-cta{background:linear-gradient(110deg,#8377f2,#5d4bd3);box-shadow:0 9px 28px #6554d926}
+.bloom-text-btn{color:#777889}.bloom-text-btn strong{color:#6554d9}
+.bloom-fineprint,.bloom-legal{color:#8c8b9c}
+.bloom-form-panel h1{color:#242333}
+.bloom-form-panel .bloom-eyebrow{color:#6554d9}
+.bloom-back-link{color:#6d6d80}
+.bloom-mode-switch{background:#f0eff7;border-color:#e4e2ef}
+.bloom-mode-switch button{color:#777889}
+.bloom-mode-switch button.active{background:#fff;color:#6554d9;box-shadow:0 2px 8px #2620470b}
+.bloom-form label{color:#555668}
+.bloom-form label small{color:#858598}
+.bloom-form input,.bloom-form textarea,.bloom-form select{background:#fff;border-color:#e2e1ec;color:#242333}
+.bloom-input-wrap{background:#fff;border-color:#e2e1ec;color:#858598}
+.bloom-input-wrap input{background:transparent}
+.bloom-form input:focus,.bloom-form textarea:focus,.bloom-form select:focus{border-color:#9186f5;outline-color:#9186f5}
+.bloom-auth-footer{color:#858598;border-top-color:#e8e6f1}
+.bloom-error{background:#fff0f2;color:#b72d4d;border-color:#ffd8df}
+.bloom-setup-note{background:#fff7e9;color:#946320;border-color:#f5e2bd}
+.bloom-loading{background:#f7f7fb;color:#242333}
+.bloom-loading strong span{color:#6554d9}
+@media(prefers-reduced-motion:reduce){.bloom-heart{animation:none}}
