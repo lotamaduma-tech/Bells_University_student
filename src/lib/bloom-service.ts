@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 export type BloomProfile = {
-  id:string; display_name:string; date_of_birth:string; bio:string; photo_path:string|null;
+  id:string; display_name:string; age:number; bio:string; photo_path:string|null;
   interests:string[]; sports:string[]; likes:string[]; dislikes:string[];
   relationship_intention:string|null; affiliation_status:string; status:string;
   age:number; photo_url:string|null;
@@ -12,12 +12,6 @@ function requireClient() {
   if (!supabase) throw new Error('Bloom backend is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
   return supabase;
 }
-function ageFromDob(value:string) {
-  const dob=new Date(value+'T00:00:00');
-  const now=new Date();
-  return now.getFullYear()-dob.getFullYear()-((now.getMonth()<dob.getMonth()||(now.getMonth()===dob.getMonth()&&now.getDate()<dob.getDate()))?1:0);
-}
-
 export async function getCurrentUserId() {
   const client=requireClient();
   const {data,error}=await client.auth.getUser();
@@ -30,7 +24,7 @@ export async function getDiscoveryProfiles(excludeIds:string[] = []):Promise<Blo
   const client=requireClient();
   const userId=await getCurrentUserId();
   const {data,error}=await client.from('profiles')
-    .select('id,display_name,date_of_birth,bio,photo_path,interests,sports,likes,dislikes,relationship_intention,affiliation_status,status')
+    .select('id,display_name,age,bio,photo_path,interests,sports,likes,dislikes,relationship_intention,affiliation_status,status')
     .eq('status','active').neq('id',userId).order('created_at',{ascending:false}).limit(40);
   if(error) throw error;
   const excluded=new Set(excludeIds);
@@ -41,7 +35,7 @@ export async function getDiscoveryProfiles(excludeIds:string[] = []):Promise<Blo
       const {data:signed,error:signError}=await client.storage.from('bloom-profile-photos').createSignedUrl(p.photo_path,60*30);
       if(!signError) photo_url=signed.signedUrl;
     }
-    return {...p,age:ageFromDob(p.date_of_birth),photo_url} as BloomProfile;
+    return {...p,photo_url} as BloomProfile;
   }));
 }
 
