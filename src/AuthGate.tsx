@@ -143,7 +143,7 @@ export default function AuthGate() {
     setSession(null); setStage('welcome'); setAuthMode('login'); setPassword(''); setBusy(false);
   };
 
-  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  useEffect(() => {\n    const shell=document.querySelector('.bloom-auth-shell') as HTMLElement|null;\n    if(!shell||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;\n    const move=(event:PointerEvent)=>{const rect=shell.getBoundingClientRect();shell.style.setProperty('--pointer-x',String((event.clientX-rect.left)/rect.width));shell.style.setProperty('--pointer-y',String((event.clientY-rect.top)/rect.height));};\n    shell.addEventListener('pointermove',move);\n    return()=>shell.removeEventListener('pointermove',move);\n  },[stage]);\n\n  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
@@ -161,7 +161,7 @@ export default function AuthGate() {
         <div className="bloom-trust-row"><span><ShieldCheck size={16}/> Students aged 16+</span><span><LockKeyhole size={15}/> Privacy-minded</span></div>
         <button className="bloom-cta" onClick={()=>{setAuthMode('signup');setStage('auth');setError('')}}>Join BellsConnect <ArrowRight size={18}/></button>
         <button className="bloom-text-btn" onClick={()=>{setAuthMode('login');setStage('auth');setError('')}}>Already have an account? <strong>Log in</strong></button>
-        <p className="bloom-fineprint">A student marketplace built to help campus businesses grow.</p>
+        <p className="bloom-fineprint">A student marketplace made for the Bells University community.</p>
       </section>}
       {stage==='auth' && <section className="bloom-form-panel">
         <button className="bloom-back-link" onClick={()=>{setStage('welcome');setError('')}}><ArrowLeft size={16}/> Back</button>
@@ -170,33 +170,33 @@ export default function AuthGate() {
         <p className="bloom-form-intro">{authMode==='signup'?'Create an account to discover products and shop from student businesses.':'Log in to pick up where you left off.'}</p>
         <div className="bloom-mode-switch"><button className={authMode==='signup'?'active':''} onClick={()=>{setAuthMode('signup');setError('')}}>Create account</button><button className={authMode==='login'?'active':''} onClick={()=>{setAuthMode('login');setError('')}}>Log in</button></div>
         <form onSubmit={submitAuth} className="bloom-form">
-          {authMode==='signup'&&<><label>Your name<input required autoComplete="name" value={displayName} onChange={e=>setDisplayName(e.target.value)} placeholder="What should we call you?" maxLength={50}/></label><label>Date of birth <small>BellsConnect is for students aged 16+</small><input required type="date" max={age16Date()} value={dob} onChange={e=>setDob(e.target.value)}/></label></>}
+          {authMode==='signup'&&<><label>Your name<input required autoComplete="name" value={displayName} onChange={e=>setDisplayName(e.target.value)} placeholder="What should we call you?" maxLength={50}/></label><label>Date of birth <small>For Bells University students aged 16+</small><input required type="date" max={age16Date()} value={dob} onChange={e=>setDob(e.target.value)}/></label></>}
           <label>Email address<div className="bloom-input-wrap"><Mail size={17}/><input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></div></label>
           <label>Password<div className="bloom-input-wrap"><LockKeyhole size={17}/><input required type="password" autoComplete={authMode==='signup'?'new-password':'current-password'} minLength={6} value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 6 characters"/></div></label>
           {error&&<p className="bloom-error" role="alert">{error}</p>}
           {clientMissing&&<p className="bloom-setup-note">Backend connection is pending. The form will work after the dedicated Supabase project and environment values are configured.</p>}
           <button className="bloom-cta" disabled={busy||clientMissing}>{busy?<LoaderCircle className="bloom-spinner"/>:authMode==='signup'?'Create my account':'Log in'} {!busy&&<ArrowRight size={17}/>}</button>
         </form>
-        <p className="bloom-legal">By continuing, you agree to treat other members respectfully and use Bloom safely.</p>
+        <p className="bloom-legal">By continuing, you agree to treat other members respectfully and use BellsConnect responsibly.</p>
       </section>}
       {stage==='confirm'&&<section className="bloom-form-panel bloom-confirm-panel"><div className="bloom-confirm-icon"><Mail size={26}/></div><p className="bloom-eyebrow">ONE QUICK CHECK</p><h1>Check your inbox.</h1><p className="bloom-form-intro">{notice||'Use the verification link we emailed you, then log in to finish your profile.'}</p><button className="bloom-cta" onClick={()=>{setStage('auth');setAuthMode('login');setPassword('');setError('')}}>Back to log in <ArrowRight size={17}/></button><button className="bloom-text-btn" onClick={()=>{setStage('welcome');setNotice('')}}>Return home</button></section>}
       {stage==='onboarding'&&<section className="bloom-form-panel bloom-onboarding-panel">
-        <div className="bloom-progress"><span/><span/><span/></div><p className="bloom-eyebrow"><Sparkles size={14}/> YOUR PROFILE, YOUR WAY</p><h1>Let’s make it <em>you.</em></h1><p className="bloom-form-intro">A few details help people discover what you have in common. Keep it honest and comfortable.</p>
+        <div className="bloom-progress"><span/><span/><span/></div><p className="bloom-eyebrow"><Sparkles size={14}/> SET UP YOUR MARKETPLACE PROFILE</p><h1>Let’s make it <em>you.</em></h1><p className="bloom-form-intro">Set up your buyer profile so your campus marketplace account is ready.</p>
         <form className="bloom-form" onSubmit={finishProfile}>
           <label className="bloom-photo-upload"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={updatePhoto}/>{photoPreview?<img src={photoPreview} alt="Profile preview"/>:<span className="bloom-photo-placeholder"><Camera size={25}/><strong>Add your profile photo</strong><small>JPG, PNG or WebP · up to 5 MB</small></span>}<span className="bloom-photo-edit"><Camera size={15}/></span></label>
           <label>Display name<input required value={displayName} onChange={e=>setDisplayName(e.target.value)} maxLength={50} placeholder="Your name"/></label>
-          <label>A little about you<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={500} placeholder="What would you want someone to know about you?"/></label>
-          <label>Things you enjoy <small>Separate each with a comma</small><input value={interests} onChange={e=>setInterests(e.target.value)} placeholder="Music, reading, coding, cooking"/></label>
-          <label>Sports you’re into <small>Optional · comma-separated</small><input value={sports} onChange={e=>setSports(e.target.value)} placeholder="Football, basketball, tennis"/></label>
-          <label>Things you like <small>Optional · comma-separated</small><input value={likes} onChange={e=>setLikes(e.target.value)} placeholder="Honesty, outdoor dates, Afrobeats"/></label>
-          <label>Things you don’t like <small>Optional · comma-separated</small><input value={dislikes} onChange={e=>setDislikes(e.target.value)} placeholder="Rudeness, ghosting, loud places"/></label>
-          <label>How will you use BellsConnect?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
+          <label>About you<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={500} placeholder="What would you want someone to know about you?"/></label>
+          <label>Interests <small>Separate each with a comma</small><input value={interests} onChange={e=>setInterests(e.target.value)} placeholder="Music, reading, coding, cooking"/></label>
+          <label>Sports <small>Optional · comma-separated</small><input value={sports} onChange={e=>setSports(e.target.value)} placeholder="Football, basketball, tennis"/></label>
+          <label>What you like <small>Optional · comma-separated</small><input value={likes} onChange={e=>setLikes(e.target.value)} placeholder="Honesty, outdoor dates, Afrobeats"/></label>
+          <label>What you avoid <small>Optional · comma-separated</small><input value={dislikes} onChange={e=>setDislikes(e.target.value)} placeholder="Rudeness, ghosting, loud places"/></label>
+          <label>How will you use the marketplace?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
           {error&&<p className="bloom-error" role="alert">{error}</p>}
           <button className="bloom-cta" disabled={busy}>{busy?<><LoaderCircle className="bloom-spinner"/> Saving your profile…</>:<>Finish profile <Check size={17}/></>}</button>
           <p className="bloom-legal">Your date of birth stays private. Your profile details support your marketplace account.</p>
         </form>
       </section>}
     </main>
-    <footer className="bloom-auth-footer"><span>© {new Date().getFullYear()} BellsConnect</span><span><ShieldCheck size={14}/> Built for thoughtful connections</span></footer>
+    <footer className="bloom-auth-footer"><span>© {new Date().getFullYear()} BellsConnect</span><span><ShieldCheck size={14}/> Built for student commerce</span></footer>
   </div>;
 }
