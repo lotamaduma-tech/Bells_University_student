@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "BellsConnect — Your campus, your people",
+  "name": "BellsConnect — Student Marketplace",
   "short_name": "BellsConnect",
-  "description": "Meet students and make plans at Bells University of Technology.",
+  "description": "Discover products and student businesses at Bells University of Technology.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#f7f7fb",
-  "theme_color": "#f7f7fb",
-  "categories": ["social", "education"],
+  "background_color": "#faf9f5",
+  "theme_color": "#174b35",
+  "categories": ["shopping", "education"],
   "icons": [
     {
       "src": "/bellsconnect-icon.svg",
