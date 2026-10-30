@@ -149,7 +149,9 @@ export default function AuthGate() {
     const move=(event:PointerEvent)=>{const rect=shell.getBoundingClientRect();shell.style.setProperty('--pointer-x',String((event.clientX-rect.left)/rect.width));shell.style.setProperty('--pointer-y',String((event.clientY-rect.top)/rect.height));};
     shell.addEventListener('pointermove',move);
     return()=>shell.removeEventListener('pointermove',move);
-  },[stage]);\n\n  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  },[stage]);
+
+  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
