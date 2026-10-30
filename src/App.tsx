@@ -3,7 +3,7 @@ import { Search, ShoppingBag, Store, Bookmark, UserRound, Plus, ArrowRight, LogO
 import { supabase } from './lib/supabase';
 
 type SellerProfile={user_id:string;store_name:string;description:string;whatsapp_phone:string;status:string};
-type Listing={id:string;seller_id:string;title:string;description:string;category:string;price_ngn:number;image_paths:string[];availability:string;fulfillment:string;created_at:string;store?:SellerProfile};
+type Listing={id:string;seller_id:string;title:string;description:string;category:string;price_ngn:number;image_paths:string[];availability:string;fulfillment:string;created_at:string;status?:string;store?:SellerProfile};
 type Category={id:string;name:string;slug:string};
 type Application={user_id:string;id:string;business_name:string;description:string;whatsapp_phone:string;category:string;status:string;admin_reason:string|null};
 type Page='home'|'explore'|'saved'|'profile'|'store'|'seller-profile'|'detail'|'apply'|'sell'|'admin';
