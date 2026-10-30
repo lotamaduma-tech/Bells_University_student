@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#faf9f5"/><circle cx="1060" cy="100" r="300" fill="#e9f1ea"/><circle cx="1090" cy="550" r="210" fill="#e9f1ea"/>
+<rect x="82" y="80" width="82" height="82" rx="22" fill="#174b35"/><path d="M98 119 123 101l25 18v25h-50z" fill="#fff"/><path d="M116 144v-15h14v15" fill="#e9f1ea"/>
+<text x="190" y="137" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="#174b35">BellsConnect</text>
+<text x="82" y="285" font-family="Arial,sans-serif" font-size="64" font-weight="700" fill="#252d29">Find what you need.</text>
+<text x="82" y="365" font-family="Arial,sans-serif" font-size="64" font-weight="700" fill="#174b35">Support student businesses.</text>
+<text x="86" y="440" font-family="Arial,sans-serif" font-size="27" fill="#727c75">Discover products and services from Bells University students.</text>
+<rect x="84" y="495" width="275" height="64" rx="15" fill="#174b35"/><text x="112" y="537" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#fff">Explore the marketplace</text>
+<g transform="translate(790 170)"><rect width="290" height="290" rx="44" fill="#174b35"/><path d="M40 112 145 40l105 72" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><rect x="55" y="110" width="180" height="140" rx="14" fill="#fff"/><path d="M125 250v-78h42v78" fill="#e9f1ea"/><path d="M80 138h40v40H80zm90 0h40v40h-40z" fill="#327653"/></g>
+</svg>
