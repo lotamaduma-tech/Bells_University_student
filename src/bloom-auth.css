@@ -83,3 +83,8 @@
 @media(max-width:600px){.bloom-auth-header{height:64px;flex-basis:64px;padding:0 16px}.bloom-wordmark{font-size:17px}.bloom-logo-mark{width:35px;height:35px}.bloom-campus{font-size:8px;padding:7px 9px;letter-spacing:.7px}.bloom-auth-main{width:min(100% - 24px,520px);padding:22px 0}.bloom-welcome,.bloom-form-panel{padding:22px 19px;border-radius:19px}.bloom-orbit-art{height:175px;min-height:175px;margin-bottom:23px}.bloom-welcome h1,.bloom-form-panel h1{font-size:30px;letter-spacing:-1.25px}.bloom-welcome-copy,.bloom-form-intro{font-size:12px}.bloom-trust-row{gap:12px;font-size:10px}.bloom-auth-footer{padding:14px 16px;font-size:9px;flex-wrap:wrap}.bloom-form{gap:13px}}
 @media(max-width:380px){.bloom-campus{font-size:7px;padding:6px 7px}.bloom-auth-header{padding:0 12px}.bloom-welcome,.bloom-form-panel{padding:20px 16px}.bloom-welcome h1{font-size:27px}}
 @media(prefers-reduced-motion:reduce){.bloom-auth-shell:before,.bloom-auth-shell:after,.bloom-heart,.bloom-orbit,.bloom-spark,.bloom-welcome,.bloom-form-panel,.bloom-spinner{animation:none!important;transition:none!important}.bloom-auth-shell{background:var(--auth-paper)}}
+
+/* IntersectionObserver reveal states */
+.auth-reveal{opacity:0;transform:translate3d(0,18px,0);filter:blur(3px);transition:opacity .72s cubic-bezier(.2,.7,.2,1),transform .72s cubic-bezier(.2,.7,.2,1),filter .72s;transition-delay:var(--auth-delay,0ms)}
+.auth-reveal.auth-revealed{opacity:1;transform:translate3d(0,0,0);filter:blur(0)}
+@media(prefers-reduced-motion:reduce){.auth-reveal,.auth-reveal.auth-revealed{opacity:1;transform:none;filter:none;transition:none}}
