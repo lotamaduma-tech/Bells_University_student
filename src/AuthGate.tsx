@@ -151,6 +151,31 @@ export default function AuthGate() {
     return()=>shell.removeEventListener('pointermove',move);
   },[stage]);
 
+  // Native browser motion: staged reveals, no animation package required.
+  useEffect(() => {
+    const shell = document.querySelector('.bloom-auth-shell') as HTMLElement | null;
+    if (!shell) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const targets = shell.querySelectorAll<HTMLElement>('.bloom-auth-header, .bloom-auth-main > section, .bloom-auth-footer, .bloom-welcome > *, .bloom-form-panel > *, .bloom-form > *');
+    if (reducedMotion.matches) {
+      targets.forEach((target) => target.classList.add('auth-revealed'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        (entry.target as HTMLElement).classList.add('auth-revealed');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+    targets.forEach((target, index) => {
+      target.classList.add('auth-reveal');
+      target.style.setProperty('--auth-delay', `${Math.min(index * 55, 440)}ms`);
+      observer.observe(target);
+    });
+    return () => observer.disconnect();
+  }, [stage]);
+
   if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
