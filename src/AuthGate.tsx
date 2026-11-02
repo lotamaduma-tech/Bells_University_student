@@ -1,18 +1,10 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
-import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
-type Intention = 'meaningful_relationship' | 'dating_with_intention' | 'open_to_relationship' | 'see_where_it_goes';
-const intentions: {value:Intention;label:string}[] = [
-  {value:'meaningful_relationship',label:'Discover student businesses'},
-  {value:'dating_with_intention',label:'Shop from student sellers'},
-  {value:'open_to_relationship',label:'Explore campus services'},
-  {value:'see_where_it_goes',label:'Support student entrepreneurs'}
-];
-const splitList = (value:string, max:number) => [...new Set(value.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,max);
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
@@ -24,11 +16,6 @@ export default function AuthGate() {
   const [displayName,setDisplayName] = useState('');
   const [dob,setDob] = useState('');
   const [bio,setBio] = useState('');
-  const [interests,setInterests] = useState('');
-  const [sports,setSports] = useState('');
-  const [likes,setLikes] = useState('');
-  const [dislikes,setDislikes] = useState('');
-  const [intention,setIntention] = useState<Intention>('meaningful_relationship');
   const [photo,setPhoto] = useState<File|null>(null);
   const [photoPreview,setPhotoPreview] = useState('');
   const [busy,setBusy] = useState(false);
@@ -119,11 +106,11 @@ export default function AuthGate() {
         display_name_value:displayName.trim(),
         bio_value:bio.trim(),
         photo_path_value:path,
-        interests_value:splitList(interests,20),
-        sports_value:splitList(sports,15),
-        likes_value:splitList(likes,30),
-        dislikes_value:splitList(dislikes,30),
-        intention_value:intention
+        interests_value:[],
+        sports_value:[],
+        likes_value:[],
+        dislikes_value:[],
+        intention_value:'meaningful_relationship'
       });
       if (profileError) {
         await supabase.storage.from('bloom-profile-photos').remove([path]);
@@ -176,13 +163,13 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
     <header className="bloom-auth-header">
-      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><Flower2 size={19}/></span>Bells<span>Connect</span></button>
+      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span>Bells<span>Connect</span></button>
       <span className="bloom-campus"><span/> BELLS UNIVERSITY</span>
     </header>
     <main className="bloom-auth-main">
@@ -219,14 +206,9 @@ export default function AuthGate() {
           <label className="bloom-photo-upload"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={updatePhoto}/>{photoPreview?<img src={photoPreview} alt="Profile preview"/>:<span className="bloom-photo-placeholder"><Camera size={25}/><strong>Add your profile photo</strong><small>JPG, PNG or WebP · up to 5 MB</small></span>}<span className="bloom-photo-edit"><Camera size={15}/></span></label>
           <label>Display name<input required value={displayName} onChange={e=>setDisplayName(e.target.value)} maxLength={50} placeholder="Your name"/></label>
           <label>About you<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={500} placeholder="What would you want someone to know about you?"/></label>
-          <label>Interests <small>Separate each with a comma</small><input value={interests} onChange={e=>setInterests(e.target.value)} placeholder="Music, reading, coding, cooking"/></label>
-          <label>Sports <small>Optional · comma-separated</small><input value={sports} onChange={e=>setSports(e.target.value)} placeholder="Football, basketball, tennis"/></label>
-          <label>What you like <small>Optional · comma-separated</small><input value={likes} onChange={e=>setLikes(e.target.value)} placeholder="Honesty, outdoor dates, Afrobeats"/></label>
-          <label>What you avoid <small>Optional · comma-separated</small><input value={dislikes} onChange={e=>setDislikes(e.target.value)} placeholder="Rudeness, ghosting, loud places"/></label>
-          <label>How will you use the marketplace?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
+          <p className="bloom-legal">Your date of birth stays private. You can add your business details later if you become a seller.</p>
           {error&&<p className="bloom-error" role="alert">{error}</p>}
           <button className="bloom-cta" disabled={busy}>{busy?<><LoaderCircle className="bloom-spinner"/> Saving your profile…</>:<>Finish profile <Check size={17}/></>}</button>
-          <p className="bloom-legal">Your date of birth stays private. Your profile details support your marketplace account.</p>
         </form>
       </section>}
     </main>
