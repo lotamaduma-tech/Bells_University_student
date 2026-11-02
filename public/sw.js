@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bellsconnect-shell-v1';
+const CACHE_NAME = 'bellsconnect-shell-v2';
 const SHELL_ASSETS = ['/manifest.webmanifest', '/bellsconnect-icon.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting()));
