@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
-import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
@@ -176,13 +176,13 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
     <header className="bloom-auth-header">
-      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><Flower2 size={19}/></span>Bells<span>Connect</span></button>
+      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span>Bells<span>Connect</span></button>
       <span className="bloom-campus"><span/> BELLS UNIVERSITY</span>
     </header>
     <main className="bloom-auth-main">
