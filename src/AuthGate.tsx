@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
-import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, Flower2, LogOut } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
@@ -176,13 +176,13 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><Flower2/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
     <header className="bloom-auth-header">
-      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><Flower2 size={19}/></span>Bells<span>Connect</span></button>
+      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span>Bells<span>Connect</span></button>
       <span className="bloom-campus"><span/> BELLS UNIVERSITY</span>
     </header>
     <main className="bloom-auth-main">
@@ -219,11 +219,7 @@ export default function AuthGate() {
           <label className="bloom-photo-upload"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={updatePhoto}/>{photoPreview?<img src={photoPreview} alt="Profile preview"/>:<span className="bloom-photo-placeholder"><Camera size={25}/><strong>Add your profile photo</strong><small>JPG, PNG or WebP · up to 5 MB</small></span>}<span className="bloom-photo-edit"><Camera size={15}/></span></label>
           <label>Display name<input required value={displayName} onChange={e=>setDisplayName(e.target.value)} maxLength={50} placeholder="Your name"/></label>
           <label>About you<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={500} placeholder="What would you want someone to know about you?"/></label>
-          <label>Interests <small>Separate each with a comma</small><input value={interests} onChange={e=>setInterests(e.target.value)} placeholder="Music, reading, coding, cooking"/></label>
-          <label>Sports <small>Optional · comma-separated</small><input value={sports} onChange={e=>setSports(e.target.value)} placeholder="Football, basketball, tennis"/></label>
-          <label>What you like <small>Optional · comma-separated</small><input value={likes} onChange={e=>setLikes(e.target.value)} placeholder="Honesty, outdoor dates, Afrobeats"/></label>
-          <label>What you avoid <small>Optional · comma-separated</small><input value={dislikes} onChange={e=>setDislikes(e.target.value)} placeholder="Rudeness, ghosting, loud places"/></label>
-          <label>How will you use the marketplace?<select value={intention} onChange={e=>setIntention(e.target.value as Intention)}>{intentions.map(i=><option value={i.value} key={i.value}>{i.label}</option>)}</select></label>
+          <p className="bloom-legal">Your date of birth stays private. You can add your business details later if you become a seller.</p>
           {error&&<p className="bloom-error" role="alert">{error}</p>}
           <button className="bloom-cta" disabled={busy}>{busy?<><LoaderCircle className="bloom-spinner"/> Saving your profile…</>:<>Finish profile <Check size={17}/></>}</button>
           <p className="bloom-legal">Your date of birth stays private. Your profile details support your marketplace account.</p>
