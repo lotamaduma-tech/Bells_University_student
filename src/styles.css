@@ -30,3 +30,7 @@
 .market-admin-metrics-actions button{white-space:nowrap}
 @media(max-width:900px){.market-admin-metrics-wide{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.market-admin-metrics-wide{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.market-admin-metrics-wide article{min-height:112px;padding:14px}.market-admin-metrics-wide article strong{font-size:25px}.market-admin-metrics-actions{align-items:flex-start;flex-direction:column}.market-admin-metrics-actions button{width:100%}}
+
+.market-detail-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.market-detail-actions .market-primary,.market-detail-actions .market-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.market-admin-status.open{background:#fff1e7;color:#9a551e}.market-admin-status.reviewing{background:#eaf1ff;color:#345d9c}.market-admin-status.resolved{background:#e8f4eb;color:#24613d}.market-admin-status.dismissed{background:#f0f1ef;color:#68716a}
+@media(max-width:600px){.market-detail-actions{display:grid;grid-template-columns:1fr}.market-detail-actions>*{width:100%}}
