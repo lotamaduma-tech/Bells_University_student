@@ -5,14 +5,6 @@ import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole,
 import App from './App';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
-type Intention = 'meaningful_relationship' | 'dating_with_intention' | 'open_to_relationship' | 'see_where_it_goes';
-const intentions: {value:Intention;label:string}[] = [
-  {value:'meaningful_relationship',label:'Discover student businesses'},
-  {value:'dating_with_intention',label:'Shop from student sellers'},
-  {value:'open_to_relationship',label:'Explore campus services'},
-  {value:'see_where_it_goes',label:'Support student entrepreneurs'}
-];
-const splitList = (value:string, max:number) => [...new Set(value.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,max);
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
@@ -24,11 +16,6 @@ export default function AuthGate() {
   const [displayName,setDisplayName] = useState('');
   const [dob,setDob] = useState('');
   const [bio,setBio] = useState('');
-  const [interests,setInterests] = useState('');
-  const [sports,setSports] = useState('');
-  const [likes,setLikes] = useState('');
-  const [dislikes,setDislikes] = useState('');
-  const [intention,setIntention] = useState<Intention>('meaningful_relationship');
   const [photo,setPhoto] = useState<File|null>(null);
   const [photoPreview,setPhotoPreview] = useState('');
   const [busy,setBusy] = useState(false);
@@ -123,7 +110,7 @@ export default function AuthGate() {
         sports_value:splitList(sports,15),
         likes_value:splitList(likes,30),
         dislikes_value:splitList(dislikes,30),
-        intention_value:intention
+        intention_value:'meaningful_relationship'
       });
       if (profileError) {
         await supabase.storage.from('bloom-profile-photos').remove([path]);
