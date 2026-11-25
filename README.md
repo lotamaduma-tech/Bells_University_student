@@ -1,44 +1,45 @@
-# BellsConnect — Bells University campus social network
+# MARKIO — Student commerce, made simple.
 
-BellsConnect is a campus-first social network for Bells University of Technology students. It is designed for students aged 16 and above and focuses on meeting classmates, finding study/activity partners, connecting by username, messaging accepted connections, and planning meet-ups at public campus locations.
+MARKIO is a university-first marketplace that helps students discover student-owned businesses, products, and services within their university community. It launches at Bells University of Technology, with an architecture intended to support additional universities later.
+
+## Current product capabilities
+
+- Supabase email/password authentication and student profile onboarding.
+- Free student buyer accounts and seller applications.
+- Admin-reviewed seller approval and vendor storefronts.
+- Product and service listings with image uploads, categories, prices, availability, and fulfilment options.
+- Marketplace search, category filtering, price sorting, product details, and saved listings.
+- Direct buyer-to-vendor contact through WhatsApp. Buyers and sellers arrange collection, delivery, and payment directly.
+- Listing reports, seller application moderation, listing moderation, and a private administrator workspace.
+- Responsive desktop and mobile layouts with reduced-motion support.
+
+## MARKIO Premium foundations
+
+The Premium area is designed for approved student vendors. The current implementation includes:
+- Vendor listing-view analytics.
+- Premium early-access interest registration and administrator review.
+- A subscription data model that can later be connected to a verified payment provider.
+
+**Paid checkout is not enabled yet.** Do not activate subscriptions or mark accounts as paid from the browser. A payment provider integration and a server-side webhook that verifies provider signatures must be implemented before collecting subscription payments or granting paid access.
 
 ## Run locally
 
 1. Install Node.js LTS.
 2. Run `npm install`.
 3. Copy `.env.example` to `.env.local`.
-4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` using the BellsConnect Supabase project values.
+4. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` using the MARKIO Supabase project values.
 5. Run `npm run dev` and open the local URL Vite prints.
 
 Never add a Supabase `service_role` key or secret key to frontend environment variables or Git.
 
-## Current features
+## Database and security
 
-- Responsive desktop/mobile BellsConnect interface.
-- Supabase email/password sign-up and login.
-- 16+ date-of-birth validation in the client and database trigger, with no arbitrary upper age limit.
-- Real member profiles only; no seeded demo discovery profiles.
-- Generated unique usernames and username/name/interest search.
-- Connection requests, acceptance/decline, and private real-time messaging for accepted connections.
-- Shareable member profile links (the viewer must sign in).
-- Campus meet-up plans using public campus locations.
-- Food-spot discovery links for known on-campus listings; names and opening details should be verified by students before relying on them.
-- RLS-backed Bells-only profile visibility, connections, chats, meet-ups, and profile-photo access.
+The application uses the existing Supabase project and marketplace schema. The MARKIO Premium foundation adds:
+- `listing_views`: authenticated, non-owner product views, visible to the listing's vendor.
+- `premium_interest`: a vendor early-access list with admin-only status management.
+- `vendor_subscriptions`: subscription records readable by the account owner and administrators; browser clients cannot create or activate subscriptions.
 
-## Supabase configuration still required
-
-The connected Supabase database schema has been updated. Email confirmation is controlled by Supabase Auth settings, not the frontend. To allow sign-up without an email verification link, open [Supabase Auth Providers](https://supabase.com/dashboard/project/gxiirebjidkgucucegzn/auth/providers) and disable **Confirm email** for the Email provider. Then test sign-up and sign-in using a fresh test account.
-
-Disabling email confirmation means email ownership is not verified. BellsConnect does not yet have an automated student-record verification integration, so do not describe accounts as institution-verified. A student verification/moderation workflow should be added before a broad launch.
-
-## Database migrations
-
-- `supabase/migrations/202610290001_bloom_initial_schema.sql` — original baseline schema.
-- `supabase/migrations/202610290004_bellsconnect_campus_social.sql` — 16+ policy and campus social tables.
-- `supabase/migrations/202610290005_bellsconnect_usernames.sql` — unique usernames.
-- `supabase/migrations/202610290006_bellsconnect_isolate_campus.sql` — Bells-only profile visibility and indexes.
-
-These migrations target the dedicated BellsConnect/Bloom Supabase project only. Never apply them to Adumex AI or NectarSpend.
+These new tables have Row Level Security enabled and explicit Data API grants. Keep the existing authentication, marketplace, and administrator policies intact when extending the database.
 
 ## Build check
 
@@ -47,4 +48,4 @@ npm install
 npm run build
 ```
 
-The GitHub Actions build check is required before merging changes. End-to-end sign-up, realtime chat, and meetup flows still need testing with two real test accounts on the deployed preview.
+The GitHub Actions build workflow and Vercel Preview deployment should pass before merging a change into `main`.
