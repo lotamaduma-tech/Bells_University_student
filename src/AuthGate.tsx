@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
+import MarkioLogo from './MarkioLogo';
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
@@ -34,7 +35,7 @@ export default function AuthGate() {
       const {data,error:profileError} = await client.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
       if (!alive) return;
       if (profileError) {
-        setError('We could not load your BellsConnect profile. Confirm the database setup is complete.');
+        setError('We could not load your MARKIO profile. Confirm the database setup is complete.');
         setStage('onboarding');
       } else if (data?.status === 'active') {
         setDisplayName(data.display_name || next.user.user_metadata?.display_name || '');
@@ -61,11 +62,11 @@ export default function AuthGate() {
 
   const submitAuth = async (event:FormEvent) => {
     event.preventDefault(); setError(''); setNotice('');
-    if (!supabase) { setError('Backend setup is not finished yet. BellsConnect needs the connected Supabase project and environment values.'); return; }
+    if (!supabase) { setError('Backend setup is not finished yet. MARKIO needs the connected Supabase project and environment values.'); return; }
     if (password.length < 6) { setError('Use a password with at least 6 characters.'); return; }
     if (authMode==='signup') {
       if (!displayName.trim() || !dob) { setError('Enter your name and date of birth to continue.'); return; }
-      if (dob > age16Date()) { setError('BellsConnect is for students aged 16 and above.'); return; }
+      if (dob > age16Date()) { setError('MARKIO is for students aged 16 and above.'); return; }
     }
     setBusy(true);
     try {
@@ -179,14 +180,14 @@ export default function AuthGate() {
         <h1>Find what you need.<br/><em>Support student businesses.</em></h1>
         <p className="bloom-welcome-copy">Discover products and services offered by students in your university community.</p>
         <div className="bloom-trust-row"><span><ShieldCheck size={16}/> Students aged 16+</span><span><LockKeyhole size={15}/> Privacy-minded</span></div>
-        <button className="bloom-cta" onClick={()=>{setAuthMode('signup');setStage('auth');setError('')}}>Join BellsConnect <ArrowRight size={18}/></button>
+        <button className="bloom-cta" onClick={()=>{setAuthMode('signup');setStage('auth');setError('')}}>Join MARKIO <ArrowRight size={18}/></button>
         <button className="bloom-text-btn" onClick={()=>{setAuthMode('login');setStage('auth');setError('')}}>Already have an account? <strong>Log in</strong></button>
         <p className="bloom-fineprint">A student marketplace made for the Bells University community.</p>
       </section>}
       {stage==='auth' && <section className="bloom-form-panel">
         <button className="bloom-back-link" onClick={()=>{setStage('welcome');setError('')}}><ArrowLeft size={16}/> Back</button>
         <p className="bloom-eyebrow"><Sparkles size={14}/> {authMode==='signup'?'YOUR MARKETPLACE ACCOUNT':'WELCOME BACK'}</p>
-        <h1>{authMode==='signup'?'Create your BellsConnect account.':'Good to see you again.'}</h1>
+        <h1>{authMode==='signup'?'Create your MARKIO account.':'Good to see you again.'}</h1>
         <p className="bloom-form-intro">{authMode==='signup'?'Create an account to discover products and shop from student businesses.':'Log in to pick up where you left off.'}</p>
         <div className="bloom-mode-switch"><button className={authMode==='signup'?'active':''} onClick={()=>{setAuthMode('signup');setError('')}}>Create account</button><button className={authMode==='login'?'active':''} onClick={()=>{setAuthMode('login');setError('')}}>Log in</button></div>
         <form onSubmit={submitAuth} className="bloom-form">
@@ -197,7 +198,7 @@ export default function AuthGate() {
           {clientMissing&&<p className="bloom-setup-note">Backend connection is pending. The form will work after the dedicated Supabase project and environment values are configured.</p>}
           <button className="bloom-cta" disabled={busy||clientMissing}>{busy?<LoaderCircle className="bloom-spinner"/>:authMode==='signup'?'Create my account':'Log in'} {!busy&&<ArrowRight size={17}/>}</button>
         </form>
-        <p className="bloom-legal">By continuing, you agree to treat other members respectfully and use BellsConnect responsibly.</p>
+        <p className="bloom-legal">By continuing, you agree to treat other members respectfully and use MARKIO responsibly.</p>
       </section>}
       {stage==='confirm'&&<section className="bloom-form-panel bloom-confirm-panel"><div className="bloom-confirm-icon"><Mail size={26}/></div><p className="bloom-eyebrow">ONE QUICK CHECK</p><h1>Check your inbox.</h1><p className="bloom-form-intro">{notice||'Use the verification link we emailed you, then log in to finish your profile.'}</p><button className="bloom-cta" onClick={()=>{setStage('auth');setAuthMode('login');setPassword('');setError('')}}>Back to log in <ArrowRight size={17}/></button><button className="bloom-text-btn" onClick={()=>{setStage('welcome');setNotice('')}}>Return home</button></section>}
       {stage==='onboarding'&&<section className="bloom-form-panel bloom-onboarding-panel">
@@ -212,6 +213,6 @@ export default function AuthGate() {
         </form>
       </section>}
     </main>
-    <footer className="bloom-auth-footer"><span>© {new Date().getFullYear()} BellsConnect</span><span><ShieldCheck size={14}/> Built for student commerce</span></footer>
+    <footer className="bloom-auth-footer"><span>© {new Date().getFullYear()} MARKIO</span><span><ShieldCheck size={14}/> Built for student commerce</span></footer>
   </div>;
 }

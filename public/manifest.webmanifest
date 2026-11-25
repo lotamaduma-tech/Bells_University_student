@@ -1,18 +1,18 @@
 {
   "id": "/",
-  "name": "BellsConnect — Student Marketplace",
-  "short_name": "BellsConnect",
-  "description": "Discover products and student businesses at Bells University of Technology.",
+  "name": "MARKIO — Student Marketplace",
+  "short_name": "MARKIO",
+  "description": "Student commerce, made simple. Discover student businesses at Bells University of Technology.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#faf9f5",
-  "theme_color": "#174b35",
+  "theme_color": "#174B3A",
   "categories": ["shopping", "education"],
   "icons": [
     {
-      "src": "/bellsconnect-icon.svg",
+      "src": "/markio-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
