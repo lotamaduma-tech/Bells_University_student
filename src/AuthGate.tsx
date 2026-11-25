@@ -164,13 +164,13 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='loading') return <div className="bloom-loading"><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span><strong>Bells<span>Connect</span></strong><LoaderCircle className="bloom-spinner"/></div>;
+  if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
     <header className="bloom-auth-header">
-      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}}><span className="bloom-logo-mark"><img src="/bellsconnect-icon.svg" alt=""/></span>Bells<span>Connect</span></button>
+      <button className="bloom-wordmark" onClick={()=>{setStage('welcome');setError('')}} aria-label="MARKIO home"><MarkioLogo className="auth-welcome-wordmark"/></button>
       <span className="bloom-campus"><span/> BELLS UNIVERSITY</span>
     </header>
     <main className="bloom-auth-main">
