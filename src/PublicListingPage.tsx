@@ -1,0 +1,16 @@
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Package, ShoppingBag, LockKeyhole } from 'lucide-react';
+import { supabase } from './lib/supabase';
+import MarkioLogo from './MarkioLogo';
+
+type Item={id:string;seller_id:string;title:string;description:string;category:string;price_ngn:number;image_paths:string[];availability:string};
+type Store={store_name:string;description:string};
+const money=(v:number)=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(v);
+const imageUrl=(path?:string|null)=>path&&supabase?supabase.storage.from('marketplace-images').getPublicUrl(path).data.publicUrl:'';
+export default function PublicListingPage({listingId,onBack}:{listingId:string;onBack:()=>void}){
+ const [item,setItem]=useState<Item|null>(null);const [store,setStore]=useState<Store|null>(null);const [loading,setLoading]=useState(true);
+ useEffect(()=>{let active=true;(async()=>{if(!supabase){setLoading(false);return}const {data}=await supabase.from('marketplace_listings').select('id,seller_id,title,description,category,price_ngn,image_paths,availability').eq('id',listingId).eq('status','approved').maybeSingle();if(!active)return;if(!data){setLoading(false);return}setItem(data as Item);const {data:storeData}=await supabase.from('seller_profiles').select('store_name,description').eq('user_id',data.seller_id).eq('status','approved').maybeSingle();if(active)setStore(storeData as Store|null);setLoading(false)})();return()=>{active=false}},[listingId]);
+ if(loading)return <main className="public-profile-shell"><MarkioLogo className="market-brand-logo"/><p>Loading listing…</p></main>;
+ if(!item)return <main className="public-profile-shell"><MarkioLogo className="market-brand-logo"/><div className="market-empty"><h2>Listing unavailable</h2><p>This listing may have been removed or is no longer approved.</p><button className="market-primary" onClick={onBack}>Back to MARKIO</button></div></main>;
+ return <main className="public-profile-shell"><header><MarkioLogo className="market-brand-logo"/><button className="market-back-button" onClick={onBack}><ArrowLeft size={15}/> MARKIO</button></header><article className="public-listing-card"><div className="public-listing-image">{item.image_paths?.[0]?<img src={imageUrl(item.image_paths[0])} alt={item.title}/>:<Package size={44}/>}</div><div className="public-listing-copy"><span className="market-kicker">{item.category}</span><h1>{item.title}</h1><strong>{money(item.price_ngn)}</strong><p>{item.description}</p><div className="public-listing-seller"><ShoppingBag size={17}/><div><b>{store?.store_name||'Student seller'}</b><small>{store?.description||'Student-owned business on MARKIO'}</small></div></div><p className="public-listing-availability">Availability: {item.availability}</p><button className="market-primary" onClick={()=>{window.location.href='/?listing='+encodeURIComponent(item.id)+'&signin=1'}}><LockKeyhole size={16}/> Sign in to contact seller</button><small className="public-listing-note">MARKIO helps students discover listings. Payment and fulfilment are arranged directly with the seller.</small></div></article><footer className="market-footer">MARKIO · Student commerce, made simple.</footer></main>;
+}
