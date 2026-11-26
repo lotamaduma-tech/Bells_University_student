@@ -19,10 +19,11 @@ type Props = {
   onReport:()=>void;
   onDelete:()=>void;
   onPin:()=>void;
+  onEditPrice:()=>void;
   onOpenSeller:()=>void;
 };
 
-export default function ListingCard({item,imageUrl,saved,isOwner,money,onOpen,onSave,onShare,onAddToCart,onReport,onDelete,onPin,onOpenSeller}:Props){
+export default function ListingCard({item,imageUrl,saved,isOwner,money,onOpen,onSave,onShare,onAddToCart,onReport,onDelete,onPin,onEditPrice,onOpenSeller}:Props){
   const [menuOpen,setMenuOpen]=useState(false);
   const menuRef=useRef<HTMLDivElement>(null);
   const timerRef=useRef<number|undefined>(undefined);
@@ -57,7 +58,7 @@ export default function ListingCard({item,imageUrl,saved,isOwner,money,onOpen,on
     <button className="product-copy" onClick={()=>{if(suppressClickRef.current)return;onOpen()}}><strong>{item.title}</strong><b>{money(item.price_ngn)}</b><small>{item.store?.store_name||'Student seller'}</small></button>
     {item.store&&<button className="market-store-link" onClick={onOpenSeller}>View store <span aria-hidden>→</span></button>}
     {menuOpen&&<div className="listing-context-menu" ref={menuRef} role="menu" aria-label="Listing actions">
-      {isOwner?<><button role="menuitem" onClick={()=>act(onPin)}><Pin size={15}/>{item.is_pinned?'Unpin listing':'Pin listing'}</button><button role="menuitem" onClick={()=>act(shareWhatsApp)}><MessageCircle size={15}/>Share to WhatsApp</button><button role="menuitem" onClick={()=>act(onShare)}><Share2 size={15}/>Share listing</button><button role="menuitem" className="danger" onClick={()=>act(onDelete)}><Trash2 size={15}/>Delete listing</button></>:<><button role="menuitem" onClick={()=>act(onAddToCart)}><ShoppingCart size={15}/>Add to cart</button><button role="menuitem" onClick={()=>act(shareWhatsApp)}><MessageCircle size={15}/>Share to WhatsApp</button><button role="menuitem" onClick={()=>act(onShare)}><Share2 size={15}/>Share listing</button><button role="menuitem" onClick={()=>act(onReport)}><Flag size={15}/>Report listing</button></>}
+      {isOwner?<><button role="menuitem" onClick={()=>act(onEditPrice)}>Edit price</button><button role="menuitem" onClick={()=>act(onPin)}><Pin size={15}/>{item.is_pinned?'Unpin listing':'Pin listing'}</button><button role="menuitem" onClick={()=>act(shareWhatsApp)}><MessageCircle size={15}/>Share to WhatsApp</button><button role="menuitem" onClick={()=>act(onShare)}><Share2 size={15}/>Share listing</button><button role="menuitem" className="danger" onClick={()=>act(onDelete)}><Trash2 size={15}/>Delete listing</button></>:<><button role="menuitem" onClick={()=>act(onAddToCart)}><ShoppingCart size={15}/>Add to cart</button><button role="menuitem" onClick={()=>act(shareWhatsApp)}><MessageCircle size={15}/>Share to WhatsApp</button><button role="menuitem" onClick={()=>act(onShare)}><Share2 size={15}/>Share listing</button><button role="menuitem" onClick={()=>act(onReport)}><Flag size={15}/>Report listing</button></>}
     </div>}
   </article>;
 }
