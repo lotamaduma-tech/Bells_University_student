@@ -362,3 +362,50 @@ html,body,#root{max-width:100%;overflow-x:clip}
  .listing-context-menu,.market-modal-backdrop,.market-report-modal{animation:none!important}
  .market-back-button,.market-cart-row,.market-legal-card{transition:none!important}
 }
+
+
+/* MARKIO interaction, mobile Safari and dedicated admin navigation */
+.market-content{padding-top:22px}
+.market-page-heading{margin:8px 0 20px}
+.market-profile-page-heading{margin-top:4px}
+.market-admin-nav-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 22px}
+.market-admin-nav-card{display:flex;align-items:center;gap:12px;min-width:0;padding:17px;border:1px solid #E6E6DE;border-radius:15px;background:#fff;color:var(--ink);text-align:left;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.market-admin-nav-card:hover{transform:translateY(-2px);border-color:#C8D5C5;box-shadow:0 10px 25px #293c3010}
+.market-admin-nav-card>span{display:grid;gap:5px;flex:1;min-width:0}
+.market-admin-nav-card b{font-size:13px;color:var(--charcoal)}
+.market-admin-nav-card small{font-size:10px;line-height:1.5;color:var(--muted)}
+.market-admin-nav-card strong{font-size:15px;color:var(--green)}
+.market-admin-nav-card>svg{flex:0 0 auto;color:var(--muted)}
+.market-admin-user-search{width:min(100%,440px);min-height:44px;margin:0 10px 12px 0;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:16px}
+.market-modal-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:#14231ccc;backdrop-filter:blur(5px)}
+.market-confirm-dialog{position:relative;width:min(100%,440px);padding:27px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 25px 80px #0003}
+.market-confirm-dialog h2{margin:10px 0;font:700 22px Manrope,Inter,sans-serif;color:var(--charcoal)}
+.market-confirm-dialog p{font-size:13px;line-height:1.7;color:#667169}
+.market-confirm-dialog>div{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.market-modal-close{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:50%;background:#F4F5F0;color:#5D685F}
+.market-toast{position:fixed;z-index:1200;right:20px;bottom:24px;display:flex;align-items:center;gap:10px;width:min(420px,calc(100vw - 32px));padding:13px 14px;border:1px solid #D6E5D8;border-radius:13px;background:#F4FAF4;color:#245D3A;box-shadow:0 15px 40px #172b1e20;font-size:12px;animation:markio-toast-in .2s ease-out}
+.market-toast span{flex:1;min-width:0;line-height:1.5}
+.market-toast>button{display:grid;place-items:center;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:inherit}
+.market-toast.error{background:#FFF5F3;border-color:#F0D7D2;color:#A13F35}
+@keyframes markio-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.market-admin-section{animation:markio-admin-enter .22s ease both}
+@keyframes markio-admin-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.market-form-card input,.market-form-card textarea,.market-form-card select,.market-search input,.market-admin-user-search,.market-settings-panel input,.market-settings-panel textarea{font-size:16px}
+.market-form-card input,.market-form-card textarea,.market-form-card select{min-height:46px}
+.market-form-card textarea{min-height:120px}
+button,.market-product,.market-settings-list button{transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease}
+.market-content{padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+@media(max-width:760px){
+ .market-content{padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
+ .market-page-heading{margin:5px 0 16px}
+ .market-admin-nav-grid{grid-template-columns:1fr;gap:8px}
+ .market-admin-nav-card{padding:14px}
+ .market-admin-nav-card b{font-size:12px}
+ .market-toast{right:12px;bottom:calc(78px + env(safe-area-inset-bottom));width:calc(100vw - 24px)}
+ .market-confirm-dialog{padding:23px 19px}
+ .market-form-card input,.market-form-card textarea,.market-form-card select,.market-search input,.market-admin-user-search,.market-settings-panel input,.market-settings-panel textarea{font-size:16px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .market-admin-section,.market-toast{animation:none!important}
+ .market-admin-nav-card,.market-admin-section,button,.market-product,.market-settings-list button{transition:none!important}
+}
