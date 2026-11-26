@@ -4,12 +4,14 @@ import { supabase } from './lib/supabase';
 import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 import MarkioLogo from './MarkioLogo';
+import PublicSellerProfile from './PublicSellerProfile';
 
-type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
+type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app' | 'public-profile';
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
+  const sharedProfileId = new URLSearchParams(window.location.search).get('profile');
   const [session,setSession] = useState<Session|null>(null);
   const [authMode,setAuthMode] = useState<'signup'|'login'>('signup');
   const [email,setEmail] = useState('');
@@ -45,7 +47,7 @@ export default function AuthGate() {
         setStage('onboarding');
       }
     };
-    client.auth.getSession().then(({data}) => syncSession(data.session));
+    client.auth.getSession().then(({data}) => { if (!data.session && sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else void syncSession(data.session); });
     const {data:{subscription}} = client.auth.onAuthStateChange((_event,next) => { void syncSession(next); });
     return () => { alive = false; subscription.unsubscribe(); };
   }, []);
@@ -164,8 +166,9 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
+  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
   if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
-  if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
+  if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut} onProfileUpdate={setDisplayName}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>
