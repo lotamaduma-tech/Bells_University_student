@@ -5,13 +5,14 @@ import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole,
 import App from './App';
 import MarkioLogo from './MarkioLogo';
 import PublicSellerProfile from './PublicSellerProfile';
+import PublicListingPage from './PublicListingPage';
 
-type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app' | 'public-profile';
+type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app' | 'public-profile' | 'public-listing';
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
-  const sharedProfileId = new URLSearchParams(window.location.search).get('profile');
+  const sharedParams = new URLSearchParams(window.location.search);\n  const sharedProfileId = sharedParams.get('profile');\n  const sharedListingId = sharedParams.get('listing');
   const [session,setSession] = useState<Session|null>(null);
   const [authMode,setAuthMode] = useState<'signup'|'login'>('signup');
   const [email,setEmail] = useState('');
@@ -33,7 +34,7 @@ export default function AuthGate() {
     const syncSession = async (next:Session|null) => {
       if (!alive) return;
       setSession(next);
-      if (!next) { setStage('welcome'); return; }
+      if (!next) { if (sharedParams.get('signin')!=='1' && sharedListingId && /^[0-9a-f-]{36}$/i.test(sharedListingId)) setStage('public-listing'); else if (sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else setStage('welcome'); return; }
       const {data,error:profileError} = await client.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
       if (!alive) return;
       if (profileError) {
@@ -47,7 +48,7 @@ export default function AuthGate() {
         setStage('onboarding');
       }
     };
-    client.auth.getSession().then(({data}) => { if (!data.session && sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else void syncSession(data.session); });
+    client.auth.getSession().then(({data}) => { if (!data.session && sharedParams.get('signin')!=='1' && sharedListingId && /^[0-9a-f-]{36}$/i.test(sharedListingId)) setStage('public-listing'); else if (!data.session && sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else void syncSession(data.session); });
     const {data:{subscription}} = client.auth.onAuthStateChange((_event,next) => { void syncSession(next); });
     return () => { alive = false; subscription.unsubscribe(); };
   }, []);
@@ -166,7 +167,7 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
+  if (stage==='public-listing' && sharedListingId) return <PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;\n  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
   if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut} onProfileUpdate={setDisplayName}/>;
 
