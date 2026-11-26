@@ -25,7 +25,7 @@ export default async function handler(req:any,res:any){
     const name=escapeHtml(profile.display_name||store.store_name);
     const description=escapeHtml((store.description||'Student-owned business on MARKIO.').slice(0,180));
     const canonical='https://'+String(req.headers.host||'').replace(/[^a-zA-Z0-9.:-]/g,'')+'/u/'+id;
-    const photo=profile.photo_path?url+'/storage/v1/object/public/bloom-profile-photos/'+profile.photo_path.split('/').map(encodeURIComponent).join('/'):store.cover_path?url+'/storage/v1/object/public/marketplace-images/'+store.cover_path.split('/').map(encodeURIComponent).join('/'):'';
+    let photo='';if(profile.photo_path){const photoPath=profile.photo_path.split('/').map(encodeURIComponent).join('/');const signedResponse=await fetch(url+'/storage/v1/object/sign/bloom-profile-photos/'+photoPath,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({expiresIn:604800})});if(signedResponse.ok){const signedData=await signedResponse.json() as {signedURL?:string;signedUrl?:string};const signed=signedData.signedURL||signedData.signedUrl||'';photo=signed.startsWith('http')?signed:signed?url+'/storage/v1'+(signed.startsWith('/')?signed:'/'+signed):''}}if(!photo&&store.cover_path)photo=url+'/storage/v1/object/public/marketplace-images/'+store.cover_path.split('/').map(encodeURIComponent).join('/');
     const image=escapeHtml(photo);
     const redirect='/?profile='+encodeURIComponent(id);
     res.setHeader('Content-Type','text/html; charset=utf-8');
