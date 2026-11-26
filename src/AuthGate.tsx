@@ -12,7 +12,8 @@ const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
-  const sharedParams = new URLSearchParams(window.location.search);\n  const sharedProfileId = sharedParams.get('profile');\n  const sharedListingId = sharedParams.get('listing');
+  const sharedParams = new URLSearchParams(window.location.search);;
+  const sharedProfileId = sharedParams.get('profile');\n  const sharedListingId = sharedParams.get('listing');
   const [session,setSession] = useState<Session|null>(null);
   const [authMode,setAuthMode] = useState<'signup'|'login'>('signup');
   const [email,setEmail] = useState('');
@@ -167,7 +168,8 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='public-listing' && sharedListingId) return <PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;\n  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
+  if (stage==='public-listing' && sharedListingId) return <PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;;
+  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
   if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut} onProfileUpdate={setDisplayName}/>;
 
