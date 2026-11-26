@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/u/:id",
+      "destination": "/api/profile?id=:id"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
