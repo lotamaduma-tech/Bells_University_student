@@ -1,0 +1,2 @@
+create policy "Public listings for discoverable seller profiles" on public.marketplace_listings for select to anon using (status = 'approved' and exists (select 1 from public.profiles p where p.id = marketplace_listings.seller_id and p.status = 'active' and p.public_profile_enabled = true));
+grant select (id, seller_id, title, description, category, price_ngn, image_paths, availability, fulfillment, created_at, is_pinned) on public.marketplace_listings to anon;
