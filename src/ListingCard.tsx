@@ -45,7 +45,7 @@ export default function ListingCard({item,imageUrl,saved,isOwner,money,onOpen,on
   useEffect(()=>{if(!menuOpen)return;const close=(event:PointerEvent)=>{if(!menuRef.current?.contains(event.target as Node))setMenuOpen(false)};const key=(event:KeyboardEvent)=>{if(event.key==='Escape')setMenuOpen(false)};document.addEventListener('pointerdown',close);document.addEventListener('keydown',key);return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',key)}},[menuOpen]);
   useEffect(()=>()=>clearTimer(),[]);
   const act=(fn:()=>void)=>{setMenuOpen(false);fn()};
-  const shareWhatsApp=()=>{const url=new URL('/',window.location.origin);url.searchParams.set('listing',item.id);const text=encodeURIComponent('Found this on MARKIO: '+item.title+' — '+money(item.price_ngn)+' '+url.toString());window.open('https://wa.me/?text='+text,'_blank','noopener,noreferrer')};
+  const shareWhatsApp=()=>{const url=new URL('/l/'+item.id,window.location.origin);const text=encodeURIComponent('Found this on MARKIO: '+item.title+' — '+money(item.price_ngn)+' '+url.toString());window.open('https://wa.me/?text='+text,'_blank','noopener,noreferrer')};
   return <article className="market-product listing-action-card" onTouchStart={startPress} onTouchMove={movePress} onTouchEnd={endPress} onTouchCancel={endPress} onContextMenu={handleContext}>
     <button className="market-product-image" onClick={()=>{if(suppressClickRef.current)return;onOpen()}} aria-label={'View '+item.title}>
       {imageUrl?<img src={imageUrl} alt={item.title}/>:<span className="product-placeholder">No image</span>}
