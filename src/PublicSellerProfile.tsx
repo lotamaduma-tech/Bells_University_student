@@ -13,7 +13,8 @@ const publicImage=(bucket:string,path:string|null)=>path&&supabase?supabase.stor
 export default function PublicSellerProfile({userId,onBack}:{userId:string;onBack:()=>void}){
  const [profile,setProfile]=useState<Profile|null>(null);
  const [store,setStore]=useState<Store|null>(null);
- const [listings,setListings]=useState<Listing[]>([]);\n const [signedProfilePhoto,setSignedProfilePhoto]=useState('');
+ const [listings,setListings]=useState<Listing[]>([]);
+ const [signedProfilePhoto,setSignedProfilePhoto]=useState('');
  const [loading,setLoading]=useState(true);
  useEffect(()=>{let active=true;(async()=>{if(!supabase){setLoading(false);return}const [{data:p},{data:s}]=await Promise.all([supabase.from('profiles').select('id,display_name,username,photo_path,public_profile_enabled').eq('id',userId).eq('public_profile_enabled',true).maybeSingle(),supabase.from('seller_profiles').select('user_id,store_name,description,cover_path,status').eq('user_id',userId).eq('status','approved').maybeSingle()]);if(!active)return;if(!p||!s){setLoading(false);return}setProfile(p as Profile);setStore(s as Store);if(p.photo_path){const {data:signed}=await supabase.storage.from('bloom-profile-photos').createSignedUrl(p.photo_path,3600);if(active&&signed?.signedUrl)setSignedProfilePhoto(signed.signedUrl)}const {data:items}=await supabase.from('marketplace_listings').select('id,title,description,category,price_ngn,image_paths,availability').eq('seller_id',userId).eq('status','approved').order('is_pinned',{ascending:false}).order('created_at',{ascending:false}).limit(30);if(active)setListings((items||[]) as Listing[]);setLoading(false)})();return()=>{active=false}},[userId]);
  if(loading)return <main className="public-profile-shell"><MarkioLogo className="market-brand-logo"/><p>Loading seller profile…</p></main>;
