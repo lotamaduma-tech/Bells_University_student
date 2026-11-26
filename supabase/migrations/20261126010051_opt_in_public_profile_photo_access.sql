@@ -1,0 +1,1 @@
+create policy "Public can access opted-in profile photos" on storage.objects for select to anon using (bucket_id = 'bloom-profile-photos' and exists (select 1 from public.profiles p where p.photo_path = storage.objects.name and p.status = 'active' and p.public_profile_enabled = true));

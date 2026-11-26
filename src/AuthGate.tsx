@@ -1,15 +1,20 @@
-import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
+import { useEffect, useState, lazy, Suspense, type FormEvent, type ChangeEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 import MarkioLogo from './MarkioLogo';
+const PublicSellerProfile = lazy(()=>import('./PublicSellerProfile'));
+const PublicListingPage = lazy(()=>import('./PublicListingPage'));
 
-type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app';
+type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app' | 'public-profile' | 'public-listing';
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
+  const sharedParams = new URLSearchParams(window.location.search);
+  const sharedProfileId = sharedParams.get('profile');
+  const sharedListingId = sharedParams.get('listing');
   const [session,setSession] = useState<Session|null>(null);
   const [authMode,setAuthMode] = useState<'signup'|'login'>('signup');
   const [email,setEmail] = useState('');
@@ -31,7 +36,7 @@ export default function AuthGate() {
     const syncSession = async (next:Session|null) => {
       if (!alive) return;
       setSession(next);
-      if (!next) { setStage('welcome'); return; }
+      if (!next) { if (sharedParams.get('signin')!=='1' && sharedListingId && /^[0-9a-f-]{36}$/i.test(sharedListingId)) setStage('public-listing'); else if (sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else setStage('welcome'); return; }
       const {data,error:profileError} = await client.from('profiles').select('status,display_name').eq('id',next.user.id).maybeSingle();
       if (!alive) return;
       if (profileError) {
@@ -45,7 +50,7 @@ export default function AuthGate() {
         setStage('onboarding');
       }
     };
-    client.auth.getSession().then(({data}) => syncSession(data.session));
+    client.auth.getSession().then(({data}) => { if (!data.session && sharedParams.get('signin')!=='1' && sharedListingId && /^[0-9a-f-]{36}$/i.test(sharedListingId)) setStage('public-listing'); else if (!data.session && sharedProfileId && /^[0-9a-f-]{36}$/i.test(sharedProfileId)) setStage('public-profile'); else void syncSession(data.session); });
     const {data:{subscription}} = client.auth.onAuthStateChange((_event,next) => { void syncSession(next); });
     return () => { alive = false; subscription.unsubscribe(); };
   }, []);
@@ -164,8 +169,10 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
+  if (stage==='public-listing' && sharedListingId) return <Suspense fallback={<div className="bloom-loading">Loading MARKIO listing…</div>}><PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/></Suspense>;
+  if (stage==='public-profile' && sharedProfileId) return <Suspense fallback={<div className="bloom-loading">Loading MARKIO profile…</div>}><PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/></Suspense>;
   if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
-  if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut}/>;
+  if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut} onProfileUpdate={setDisplayName}/>;
 
   return <div className="bloom-auth-shell">
     <div className="bloom-auth-glow bloom-glow-one"/><div className="bloom-auth-glow bloom-glow-two"/>

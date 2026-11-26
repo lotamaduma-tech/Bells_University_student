@@ -1,0 +1,23 @@
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Package, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { supabase } from './lib/supabase';
+import MarkioLogo from './MarkioLogo';
+
+type Profile={id:string;display_name:string;username:string;photo_path:string|null;public_profile_enabled:boolean};
+type Store={user_id:string;store_name:string;description:string;cover_path:string|null;status:string};
+type Listing={id:string;title:string;description:string;category:string;price_ngn:number;image_paths:string[];availability:string};
+
+const money=(v:number)=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(v);
+const publicImage=(bucket:string,path:string|null)=>path&&supabase?supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl:'';
+
+export default function PublicSellerProfile({userId,onBack}:{userId:string;onBack:()=>void}){
+ const [profile,setProfile]=useState<Profile|null>(null);
+ const [store,setStore]=useState<Store|null>(null);
+ const [listings,setListings]=useState<Listing[]>([]);
+ const [signedProfilePhoto,setSignedProfilePhoto]=useState('');
+ const [loading,setLoading]=useState(true);
+ useEffect(()=>{let active=true;(async()=>{if(!supabase){setLoading(false);return}const [{data:p},{data:s}]=await Promise.all([supabase.from('profiles').select('id,display_name,username,photo_path,public_profile_enabled').eq('id',userId).eq('public_profile_enabled',true).maybeSingle(),supabase.from('seller_profiles').select('user_id,store_name,description,cover_path,status').eq('user_id',userId).eq('status','approved').maybeSingle()]);if(!active)return;if(!p||!s){setLoading(false);return}setProfile(p as Profile);setStore(s as Store);if(p.photo_path){const {data:signed}=await supabase.storage.from('bloom-profile-photos').createSignedUrl(p.photo_path,3600);if(active&&signed?.signedUrl)setSignedProfilePhoto(signed.signedUrl)}const {data:items}=await supabase.from('marketplace_listings').select('id,title,description,category,price_ngn,image_paths,availability').eq('seller_id',userId).eq('status','approved').order('is_pinned',{ascending:false}).order('created_at',{ascending:false}).limit(30);if(active)setListings((items||[]) as Listing[]);setLoading(false)})();return()=>{active=false}},[userId]);
+ if(loading)return <main className="public-profile-shell"><MarkioLogo className="market-brand-logo"/><p>Loading seller profile…</p></main>;
+ if(!profile||!store)return <main className="public-profile-shell"><MarkioLogo className="market-brand-logo"/><div className="market-empty"><h2>Profile unavailable</h2><p>This seller has not enabled public profile sharing, or the link is no longer available.</p><button className="market-primary" onClick={onBack}>Back to MARKIO</button></div></main>;
+ return <main className="public-profile-shell"><header><MarkioLogo className="market-brand-logo"/><button className="market-back-button" onClick={onBack}><ArrowLeft size={15}/> MARKIO</button></header><section className="public-profile-card"><div className="public-profile-cover">{store.cover_path&&<img src={publicImage('marketplace-images',store.cover_path)} alt={store.store_name+' cover'}/>}</div><div className="public-profile-heading"><div className="market-public-avatar">{signedProfilePhoto?<img src={signedProfilePhoto} alt={profile.display_name}/>:<span>{profile.display_name.slice(0,1).toUpperCase()}</span>}</div><span className="market-kicker">MARKIO SELLER</span><h1>{profile.display_name}</h1><p>@{profile.username}</p><h2>{store.store_name}</h2><p>{store.description}</p><span className="seller-approved-label"><ShieldCheck size={14}/> Approved MARKIO seller</span></div></section><section className="public-profile-catalogue"><div className="market-section-head"><div><span className="market-kicker">STUDENT COMMERCE</span><h2>Products and services</h2></div><span>{listings.length} listings</span></div>{listings.length?<div className="market-grid">{listings.map(item=><article className="market-product" key={item.id}><div className="market-product-image">{item.image_paths?.[0]?<img src={publicImage('marketplace-images',item.image_paths[0])} alt={item.title}/>:<span className="product-placeholder"><Package size={28}/></span>}</div><div className="product-copy"><strong>{item.title}</strong><b>{money(item.price_ngn)}</b><small>{item.category} · {item.availability}</small></div></article>)}</div>:<div className="market-empty"><ShoppingBag/><h3>No public listings yet</h3><p>This seller has not published any approved products.</p></div>}</section><footer className="market-footer">MARKIO · Student commerce, made simple.</footer></main>;
+}
