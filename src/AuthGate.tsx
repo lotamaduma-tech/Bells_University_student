@@ -4,8 +4,8 @@ import { supabase } from './lib/supabase';
 import { ArrowRight, ArrowLeft, Users, Sparkles, ShieldCheck, Mail, LockKeyhole, Camera, Check, LoaderCircle, LogOut } from 'lucide-react';
 import App from './App';
 import MarkioLogo from './MarkioLogo';
-import PublicSellerProfile from './PublicSellerProfile';
-import PublicListingPage from './PublicListingPage';
+const PublicSellerProfile = lazy(()=>import('./PublicSellerProfile'));
+const PublicListingPage = lazy(()=>import('./PublicListingPage'));
 
 type Stage = 'loading' | 'welcome' | 'auth' | 'confirm' | 'onboarding' | 'app' | 'public-profile' | 'public-listing';
 const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
@@ -169,8 +169,8 @@ export default function AuthGate() {
     return () => observer.disconnect();
   }, [stage]);
 
-  if (stage==='public-listing' && sharedListingId) return <PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
-  if (stage==='public-profile' && sharedProfileId) return <PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/>;
+  if (stage==='public-listing' && sharedListingId) return <Suspense fallback={<div className="bloom-loading">Loading MARKIO listing…</div>}><PublicListingPage listingId={sharedListingId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/></Suspense>;
+  if (stage==='public-profile' && sharedProfileId) return <Suspense fallback={<div className="bloom-loading">Loading MARKIO profile…</div>}><PublicSellerProfile userId={sharedProfileId} onBack={()=>{window.history.replaceState({},'','/');setStage('welcome')}}/></Suspense>;
   if (stage==='loading') return <div className="bloom-loading"><MarkioLogo className="auth-loading-logo"/><LoaderCircle className="bloom-spinner"/></div>;
   if (stage==='app' && session) return <App displayName={displayName} onSignOut={signOut} onProfileUpdate={setDisplayName}/>;
 
