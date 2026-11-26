@@ -409,3 +409,5 @@ button,.market-product,.market-settings-list button{transition:background-color 
  .market-admin-section,.market-toast{animation:none!important}
  .market-admin-nav-card,.market-admin-section,button,.market-product,.market-settings-list button{transition:none!important}
 }
+
+@media(max-width:760px){input,textarea,select{font-size:16px!important}input,textarea,select{scroll-margin-bottom:120px}}
