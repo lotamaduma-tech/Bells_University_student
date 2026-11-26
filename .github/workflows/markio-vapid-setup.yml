@@ -1,0 +1,244 @@
+name: MARKIO one-time VAPID setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type CONFIGURE_MARKIO_VAPID to authorize the one-time setup
+        required: true
+        type: choice
+        default: DO_NOT_RUN
+        options:
+          - DO_NOT_RUN
+          - CONFIGURE_MARKIO_VAPID
+
+permissions:
+  contents: read
+
+concurrency:
+  group: markio-vapid-production-setup
+  cancel-in-progress: false
+
+jobs:
+  configure:
+    if: github.ref == 'refs/heads/main' && inputs.confirmation == 'CONFIGURE_MARKIO_VAPID'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 3.4.0
+
+      - name: Generate and configure VAPID keys
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          SUPABASE_PROJECT_REF: gxiirebjidkgucucegzn
+          VERCEL_PROJECT_ID: prj_0jT42nxMmHbqcnKYJJQCdLhSVzW0
+          VERCEL_TEAM_ID: team_hp5gcmhb4rkGvaYE5Lnzcj5f
+        run: |
+          set -euo pipefail
+          set +x
+
+          : "${SUPABASE_ACCESS_TOKEN:?Missing SUPABASE_ACCESS_TOKEN GitHub Actions secret}"
+          : "${VERCEL_TOKEN:?Missing VERCEL_TOKEN GitHub Actions secret}"
+
+          WORK_DIR="$(mktemp -d "${RUNNER_TEMP}/markio-vapid.XXXXXX")"
+          chmod 700 "$WORK_DIR"
+          SUCCESS=false
+          SUPABASE_WRITE_ATTEMPTED=false
+          VERCEL_ENV_ID=""
+
+          cleanup() {
+            local exit_code=$?
+            if [[ "$SUCCESS" != "true" ]]; then
+              if [[ "$SUPABASE_WRITE_ATTEMPTED" == "true" ]]; then
+                supabase secrets unset MARKIO_VAPID_PUBLIC_KEY MARKIO_VAPID_PRIVATE_KEY \
+                  --project-ref "$SUPABASE_PROJECT_REF" --yes >/dev/null 2>&1 || true
+              fi
+              if [[ -n "$VERCEL_ENV_ID" ]]; then
+                curl --silent --show-error --fail \
+                  -X DELETE \
+                  -H "Authorization: Bearer $VERCEL_TOKEN" \
+                  "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env/$VERCEL_ENV_ID?teamId=$VERCEL_TEAM_ID" \
+                  >/dev/null 2>&1 || true
+              fi
+            fi
+            rm -rf "$WORK_DIR"
+            return "$exit_code"
+          }
+          trap cleanup EXIT
+
+          # Read-only preflight: require the existing subject and refuse to overwrite either key.
+          if ! supabase secrets list --project-ref "$SUPABASE_PROJECT_REF" \
+            >"$WORK_DIR/supabase-before.txt" 2>&1; then
+            echo "::error::Cannot list Supabase secrets. Check the scoped token's Edge Function Secrets read permission and project access."
+            exit 1
+          fi
+
+          if ! grep -Fq "MARKIO_VAPID_SUBJECT" "$WORK_DIR/supabase-before.txt"; then
+            echo "::error::MARKIO_VAPID_SUBJECT was not found. Nothing was changed."
+            exit 1
+          fi
+
+          if grep -Eq "MARKIO_VAPID_(PUBLIC|PRIVATE)_KEY" "$WORK_DIR/supabase-before.txt"; then
+            echo "::error::At least one VAPID key already exists. Refusing to overwrite it."
+            exit 1
+          fi
+
+          # Confirm Vercel access and ensure this workflow will not overwrite an existing value.
+          node --input-type=commonjs <<'NODE'
+          const projectId = process.env.VERCEL_PROJECT_ID;
+          const teamId = process.env.VERCEL_TEAM_ID;
+          const token = process.env.VERCEL_TOKEN;
+          const url = new URL(`https://api.vercel.com/v10/projects/${encodeURIComponent(projectId)}/env`);
+          url.searchParams.set('teamId', teamId);
+          url.searchParams.set('decrypt', 'false');
+          url.searchParams.set('limit', '100');
+
+          (async () => {
+            const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+            if (!response.ok) throw new Error(`Vercel environment preflight failed (HTTP ${response.status}).`);
+            const data = await response.json();
+            if (!Array.isArray(data.envs)) throw new Error('Vercel returned an unexpected environment-variable response.');
+            if (data.envs.some((entry) => entry.key === 'VITE_MARKIO_VAPID_PUBLIC_KEY')) {
+              throw new Error('VITE_MARKIO_VAPID_PUBLIC_KEY already exists. Refusing to overwrite it.');
+            }
+          })().catch((error) => {
+            process.stderr.write(`${error.message}\n`);
+            process.exitCode = 1;
+          });
+          NODE
+
+          # Install the exact web-push version used by the existing Edge Function, outside the repo.
+          if ! npm install --prefix "$WORK_DIR" --no-save --no-package-lock --ignore-scripts \
+            --no-audit --no-fund web-push@3.6.7 >"$WORK_DIR/npm-install.log" 2>&1; then
+            echo "::error::Could not install the pinned web-push key-generation library."
+            exit 1
+          fi
+
+          # Generate keys in runner memory and write them only to a private temporary file.
+          WORK_DIR="$WORK_DIR" node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const webpush = require(path.join(process.env.WORK_DIR, 'node_modules', 'web-push'));
+          const keys = webpush.generateVAPIDKeys();
+
+          if (!keys.publicKey || !keys.privateKey) throw new Error('VAPID key generation failed.');
+          const envFile = [
+            `MARKIO_VAPID_PUBLIC_KEY=${keys.publicKey}`,
+            `MARKIO_VAPID_PRIVATE_KEY=${keys.privateKey}`,
+            ''
+          ].join('\n');
+
+          fs.writeFileSync(path.join(process.env.WORK_DIR, 'supabase-vapid.env'), envFile, {
+            mode: 0o600,
+            flag: 'wx'
+          });
+          fs.writeFileSync(path.join(process.env.WORK_DIR, 'vercel-public-key.txt'), keys.publicKey, {
+            mode: 0o600,
+            flag: 'wx'
+          });
+          NODE
+
+          # Add only the public key to Vercel. The private key is never sent to Vercel.
+          WORK_DIR="$WORK_DIR" node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const projectId = process.env.VERCEL_PROJECT_ID;
+          const teamId = process.env.VERCEL_TEAM_ID;
+          const token = process.env.VERCEL_TOKEN;
+          const publicKey = fs.readFileSync(path.join(process.env.WORK_DIR, 'vercel-public-key.txt'), 'utf8');
+          const url = new URL(`https://api.vercel.com/v10/projects/${encodeURIComponent(projectId)}/env`);
+          url.searchParams.set('teamId', teamId);
+
+          (async () => {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                key: 'VITE_MARKIO_VAPID_PUBLIC_KEY',
+                value: publicKey,
+                type: 'plain',
+                target: ['production', 'preview', 'development']
+              })
+            });
+            if (!response.ok) throw new Error(`Vercel could not create the public environment variable (HTTP ${response.status}).`);
+            const result = await response.json();
+            if (!result.id) throw new Error('Vercel did not return the created environment-variable ID.');
+            fs.writeFileSync(path.join(process.env.WORK_DIR, 'vercel-env-id.txt'), result.id, {
+              mode: 0o600,
+              flag: 'wx'
+            });
+          })().catch((error) => {
+            process.stderr.write(`${error.message}\n`);
+            process.exitCode = 1;
+          });
+          NODE
+          VERCEL_ENV_ID="$(cat "$WORK_DIR/vercel-env-id.txt")"
+
+          # Push exactly two secrets. MARKIO_VAPID_SUBJECT is deliberately absent from this file.
+          SUPABASE_WRITE_ATTEMPTED=true
+          if ! supabase secrets set --env-file "$WORK_DIR/supabase-vapid.env" \
+            --project-ref "$SUPABASE_PROJECT_REF" --yes >"$WORK_DIR/supabase-set.log" 2>&1; then
+            echo "::error::Supabase rejected the VAPID secret update. The workflow will attempt to roll back only the two new VAPID keys and the public Vercel variable."
+            exit 1
+          fi
+
+          # Verify names only; never retrieve or print secret values.
+          if ! supabase secrets list --project-ref "$SUPABASE_PROJECT_REF" \
+            >"$WORK_DIR/supabase-after.txt" 2>&1; then
+            echo "::error::Could not verify the Supabase secret names. Rolling back the changes made by this run."
+            exit 1
+          fi
+
+          for name in MARKIO_VAPID_SUBJECT MARKIO_VAPID_PUBLIC_KEY MARKIO_VAPID_PRIVATE_KEY; do
+            if ! grep -Fq "$name" "$WORK_DIR/supabase-after.txt"; then
+              echo "::error::Supabase verification did not find all required secret names. Rolling back the changes made by this run."
+              exit 1
+            fi
+          done
+
+          WORK_DIR="$WORK_DIR" node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const projectId = process.env.VERCEL_PROJECT_ID;
+          const teamId = process.env.VERCEL_TEAM_ID;
+          const token = process.env.VERCEL_TOKEN;
+          const url = new URL(`https://api.vercel.com/v10/projects/${encodeURIComponent(projectId)}/env`);
+          url.searchParams.set('teamId', teamId);
+          url.searchParams.set('decrypt', 'false');
+          url.searchParams.set('limit', '100');
+
+          (async () => {
+            const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+            if (!response.ok) throw new Error(`Vercel verification failed (HTTP ${response.status}).`);
+            const data = await response.json();
+            if (!Array.isArray(data.envs) || !data.envs.some((entry) =>
+              entry.key === 'VITE_MARKIO_VAPID_PUBLIC_KEY' &&
+              ['production', 'preview', 'development'].every((target) => entry.target?.includes(target))
+            )) {
+              throw new Error('Vercel public-key environment variable verification failed.');
+            }
+          })().catch((error) => {
+            process.stderr.write(`${error.message}\n`);
+            process.exitCode = 1;
+          });
+          NODE
+
+          SUCCESS=true
+          echo "MARKIO VAPID setup completed. Supabase secret names and Vercel environment-variable targets were verified; no key values were displayed."
