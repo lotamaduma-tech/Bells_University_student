@@ -12,8 +12,10 @@ const age16Date = () => { const d = new Date(); d.setFullYear(d.getFullYear()-16
 
 export default function AuthGate() {
   const [stage,setStage] = useState<Stage>('loading');
-  const sharedParams = new URLSearchParams(window.location.search);;
-  const sharedProfileId = sharedParams.get('profile');\n  const sharedListingId = sharedParams.get('listing');
+  const sharedParams = new URLSearchParams(window.location.search);
+  const sharedParams = new URLSearchParams(window.location.search);
+  const sharedProfileId = sharedParams.get('profile');
+  const sharedListingId = sharedParams.get('listing');
   const [session,setSession] = useState<Session|null>(null);
   const [authMode,setAuthMode] = useState<'signup'|'login'>('signup');
   const [email,setEmail] = useState('');
