@@ -228,7 +228,7 @@ jobs:
       - name: Redeploy and verify the production frontend
         shell: bash
         env:
-          VERCEL_TOKEN: \${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: prj_0jT42nxMmHbqcnKYJJQCdLhSVzW0
           VERCEL_TEAM_ID: team_hp5gcmhb4rkGvaYE5Lnzcj5f
         run: |
@@ -236,7 +236,7 @@ jobs:
           node <<'NODE'
           const projectId = process.env.VERCEL_PROJECT_ID;
           const teamId = process.env.VERCEL_TEAM_ID;
-          const headers = { Authorization: \`Bearer \${process.env.VERCEL_TOKEN}\` };
+          const headers = { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` };
           const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
           async function request(url, options = {}) {
@@ -245,7 +245,7 @@ jobs:
               headers: { ...headers, ...(options.headers || {}) }
             });
             if (!response.ok) {
-              throw new Error(\`Vercel API request failed (HTTP \${response.status}).\`);
+              throw new Error(`Vercel API request failed (HTTP ${response.status}).`);
             }
             return response.json();
           }
@@ -276,12 +276,12 @@ jobs:
             const newId = created.id || created.uid;
             if (!newId) throw new Error('Vercel did not return a deployment ID.');
 
-            const inspectUrl = new URL(\`https://api.vercel.com/v13/deployments/\${encodeURIComponent(newId)}\`);
+            const inspectUrl = new URL(`https://api.vercel.com/v13/deployments/${encodeURIComponent(newId)}`);
             inspectUrl.searchParams.set('teamId', teamId);
             for (let attempt = 0; attempt < 90; attempt += 1) {
               const deployment = await request(inspectUrl);
               if (deployment.readyState === 'READY' || deployment.state === 'READY') {
-                process.stdout.write('Production frontend redeployment completed and verified.\\n');
+                process.stdout.write('Production frontend redeployment completed and verified.\n');
                 return;
               }
               if (deployment.readyState === 'ERROR' || deployment.state === 'ERROR') {
@@ -291,7 +291,7 @@ jobs:
             }
             throw new Error('Timed out while waiting for the production deployment to become READY.');
           })().catch((error) => {
-            process.stderr.write(\`\${error.message}\\n\`);
+            process.stderr.write(`${error.message}\n`);
             process.exitCode = 1;
           });
           NODE
