@@ -1,7 +1,7 @@
 begin;
 
--- Allow administrator alerts to use the same push outbox as student notifications.
--- Account-security notices remain in-app only until their delivery policy is explicitly enabled.
+-- Allow admin-category notifications through the existing push outbox.
+-- Account-security notifications remain in-app only.
 create or replace function private.enqueue_markio_push()
 returns trigger
 language plpgsql
@@ -50,7 +50,7 @@ end;
 $fn$;
 revoke all on function private.enqueue_markio_push() from public,anon,authenticated,service_role;
 
--- Notify every administrator when a student profile is created.
+-- Notify every MARKIO administrator when a student profile is created.
 create or replace function public.markio_notify_admin_registration()
 returns trigger
 language plpgsql
@@ -59,9 +59,7 @@ set search_path=''
 as $fn$
 declare admin_row record;
 begin
-  for admin_row in
-    select user_id from public.bellsconnect_admins
-  loop
+  for admin_row in select user_id from public.bellsconnect_admins loop
     perform public.markio_emit_notification(
       admin_row.user_id,
       null,
@@ -85,66 +83,6 @@ after insert on public.profiles
 for each row execute function public.markio_notify_admin_registration();
 
 -- Notify administrators when a new listing enters the review queue.
-create or replace function public.markio_notify_admin_submission()
-returns trigger
-language plpgsql
-security definer
-set search_path=''
-as $fn$
-declare admin_row record; title_text text; body_text text; path_text text; kind_text text;
-begin
-  if tg_table_name='seller_applications' then
-    title_text:='New seller application';
-    body_text:='A student submitted a seller application for review.';
-    path_text:='/admin/sellers?application='||new.id::text;
-    kind_text:='seller_application';
-  elsif tg_table_name='marketplace_listings' then
-    title_text:='New listing submitted';
-    body_text:='A seller submitted a new product or service listing for review.';
-    path_text:='/admin';
-    kind_text:='new_listing';
-  elsif tg_table_name='marketplace_account_requests' then
-    title_text:='New account request';
-    body_text:='A user submitted an account request.';
-    path_text:='/admin/requests?request='||new.id::text;
-    kind_text:='account_request';
-  elsif tg_table_name='listing_reports' then
-    title_text:='New listing report';
-    body_text:='A marketplace listing was reported.';
-    path_text:='/admin/reports?report='||new.id::text;
-    kind_text:='listing_report';
-  elsif tg_table_name='bellsconnect_feedback' then
-    title_text:='New support request';
-    body_text:='A user submitted a support request.';
-    path_text:='/admin/support?request='||new.id::text;
-    kind_text:='support_request';
-  elsif tg_table_name='premium_interest' then
-    title_text:='Premium early access request';
-    body_text:='A user requested MARKIO Premium early access.';
-    path_text:='/admin/premium?user='||new.user_id::text;
-    kind_text:='premium_interest';
-  else
-    return new;
-  end if;
-
-  for admin_row in select user_id from public.bellsconnect_admins loop
-    perform public.markio_emit_notification(
-      admin_row.user_id,
-      null,
-      kind_text,
-      'admin',
-      title_text,
-      body_text,
-      path_text,
-      tg_table_name||':'||new.id::text||':'||admin_row.user_id::text,
-      jsonb_build_object('record_id',new.id,'source_table',tg_table_name)
-    );
-  end loop;
-  return new;
-end;
-$fn$;
-revoke all on function public.markio_notify_admin_submission() from public,anon,authenticated;
-
 drop trigger if exists markio_admin_new_listing on public.marketplace_listings;
 create trigger markio_admin_new_listing
 after insert on public.marketplace_listings
