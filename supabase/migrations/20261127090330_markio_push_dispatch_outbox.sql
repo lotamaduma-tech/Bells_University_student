@@ -192,7 +192,7 @@ begin
     return new;
   end if;
 
-  token:=encode(gen_random_bytes(32),'hex');
+  token:=encode(extensions.gen_random_bytes(32),'hex');
   insert into private.markio_push_dispatch_jobs(notification_id,recipient_id,dispatch_token)
   values(new.id,new.recipient_id,token)
   on conflict(notification_id) do nothing;
