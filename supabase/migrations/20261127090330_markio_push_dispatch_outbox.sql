@@ -104,7 +104,6 @@ language plpgsql
 security definer
 set search_path=''
 as $fn$
-declare finished boolean;
 begin
   if p_status not in ('delivered','skipped','retry','failed') then
     raise exception 'Invalid push job status';
@@ -132,8 +131,7 @@ begin
     and j.dispatch_token=p_dispatch_token
     and j.status='processing';
 
-  get diagnostics finished = row_count;
-  return finished;
+  return found;
 end;
 $fn$;
 revoke all on function public.markio_finish_push_job(uuid,text,text,text,integer) from public,anon,authenticated;
