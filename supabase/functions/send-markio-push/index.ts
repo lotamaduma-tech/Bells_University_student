@@ -72,14 +72,6 @@ Deno.serve(async (req) => {
   };
 
   try {
-    const publicKey = Deno.env.get("MARKIO_VAPID_PUBLIC_KEY");
-    const privateKey = Deno.env.get("MARKIO_VAPID_PRIVATE_KEY");
-    const subject = Deno.env.get("MARKIO_VAPID_SUBJECT");
-    if (!publicKey || !privateKey || !subject) {
-      await finish("retry", "VAPID configuration is incomplete.", 1800);
-      return json({ error: "Push delivery is not configured on the server." }, 503);
-    }
-
     const { data: notification, error: notificationError } = await db
       .from("markio_notifications")
       .select("id,recipient_id,title,body,target_path,category")
@@ -128,6 +120,14 @@ Deno.serve(async (req) => {
     if (!subscriptions?.length) {
       await finish("skipped", "No active push subscriptions.");
       return json({ sent: 0, skipped: true });
+    }
+
+    const publicKey = Deno.env.get("MARKIO_VAPID_PUBLIC_KEY");
+    const privateKey = Deno.env.get("MARKIO_VAPID_PRIVATE_KEY");
+    const subject = Deno.env.get("MARKIO_VAPID_SUBJECT");
+    if (!publicKey || !privateKey || !subject) {
+      await finish("retry", "VAPID configuration is incomplete.", 1800);
+      return json({ error: "Push delivery is not configured on the server." }, 503);
     }
 
     const { data: alreadyDelivered, error: deliveryReadError } = await db.rpc(
