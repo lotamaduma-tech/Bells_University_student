@@ -102,7 +102,6 @@ Deno.serve(async (req) => {
     const preference = categoryPreference[notice.category];
     if (
       !prefs?.push_enabled ||
-      notice.category === "admin" ||
       notice.category === "account_security" ||
       (preference && (prefs as PushPreference)[preference] === false)
     ) {
